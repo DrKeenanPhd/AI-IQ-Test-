@@ -1,10 +1,16 @@
 from fastapi import FastAPI, HTTPException, Depends
 from fastapi.middleware.cors import CORSMiddleware
-from pydantic import BaseModel, EmailStr
+from .models import (
+    UserAuth, DynamicTestResult, TestResultResponse, 
+    CreateTestResultRequest, GHLWebhookData, TestParameter
+)
+from .ghl_client import GHLClient
+from .test_engine import AIIQTestEngine
 from typing import Dict, List, Optional, Any
 from datetime import datetime
 import uuid
 import json
+import os
 
 app = FastAPI(title="AI IQ Test Results API", version="1.0.0")
 
@@ -20,109 +26,11 @@ app.add_middleware(
 users_db = {}
 test_results_db = {}
 
-class UserAuth(BaseModel):
-    email: EmailStr
-    name: str
-    mobile: str
+ghl_client = GHLClient()
+test_engine = AIIQTestEngine()
 
-class TestResult(BaseModel):
-    user_id: str
-    pain_points: Dict[str, Dict[str, Any]]
-    categories: Dict[str, Dict[str, Any]]
-    overall_score: int
-    recommendations: List[str]
-    created_at: datetime
-
-class TestResultResponse(BaseModel):
-    id: str
-    user_email: str
-    user_name: str
-    pain_points: Dict[str, Dict[str, Any]]
-    categories: Dict[str, Dict[str, Any]]
-    overall_score: int
-    recommendations: List[str]
-    created_at: datetime
-
-def create_sample_result(user_id: str) -> TestResult:
-    return TestResult(
-        user_id=user_id,
-        pain_points={
-            "cant_scale_without_burnout": {
-                "score": 7,
-                "description": "Struggling with delegation and automation",
-                "severity": "high",
-                "recommendations": ["Implement AI-powered task automation", "Create standard operating procedures"]
-            },
-            "invisible_attention_landscape": {
-                "score": 5,
-                "description": "Limited visibility in digital channels",
-                "severity": "medium",
-                "recommendations": ["Optimize SEO strategy", "Increase social media presence"]
-            },
-            "outgunned_by_competitors": {
-                "score": 8,
-                "description": "Competitors using advanced AI tools",
-                "severity": "high",
-                "recommendations": ["Adopt AI-powered analytics", "Implement chatbot solutions"]
-            },
-            "tech_gap_ai_advantages": {
-                "score": 6,
-                "description": "Underutilizing available AI technologies",
-                "severity": "medium",
-                "recommendations": ["AI training for team", "Implement AI workflow automation"]
-            }
-        },
-        categories={
-            "website_form_function": {
-                "score": 32,
-                "max_score": 40,
-                "percentage": 80,
-                "strengths": ["Good mobile responsiveness", "Fast loading times"],
-                "weaknesses": ["Poor conversion optimization", "Limited AI integration"],
-                "priority_actions": ["Add AI chatbot", "Implement dynamic personalization"]
-            },
-            "social_media_effectiveness": {
-                "score": 28,
-                "max_score": 40,
-                "percentage": 70,
-                "strengths": ["Consistent posting", "Good engagement rates"],
-                "weaknesses": ["Limited automation", "No AI content generation"],
-                "priority_actions": ["Implement AI content creation", "Automate posting schedules"]
-            },
-            "digital_presence": {
-                "score": 30,
-                "max_score": 40,
-                "percentage": 75,
-                "strengths": ["Strong brand recognition", "Good online reviews"],
-                "weaknesses": ["Limited SEO optimization", "No AI-powered insights"],
-                "priority_actions": ["AI-powered SEO optimization", "Implement analytics automation"]
-            },
-            "communication": {
-                "score": 26,
-                "max_score": 40,
-                "percentage": 65,
-                "strengths": ["Clear messaging", "Good customer service"],
-                "weaknesses": ["Manual processes", "No AI assistance"],
-                "priority_actions": ["Deploy AI customer service", "Automate follow-up sequences"]
-            },
-            "marketing": {
-                "score": 34,
-                "max_score": 40,
-                "percentage": 85,
-                "strengths": ["Good targeting", "Strong campaigns"],
-                "weaknesses": ["Limited personalization", "Manual optimization"],
-                "priority_actions": ["AI-powered personalization", "Automated A/B testing"]
-            }
-        },
-        overall_score=150,
-        recommendations=[
-            "Implement comprehensive AI automation strategy",
-            "Focus on high-impact areas: scaling and competitor analysis",
-            "Prioritize AI integration in customer-facing processes",
-            "Develop team AI literacy and capabilities"
-        ],
-        created_at=datetime.now()
-    )
+def create_sample_result(user_id: str) -> DynamicTestResult:
+    return test_engine.generate_dynamic_test_result(user_id)
 
 @app.get("/healthz")
 async def healthz():
@@ -131,35 +39,97 @@ async def healthz():
 @app.post("/auth/login")
 async def login_user(user_auth: UserAuth):
     user_id = str(uuid.uuid4())
+    ghl_contact_id = None
+    
+    if ghl_client.enabled:
+        try:
+            contact_result = await ghl_client.create_or_update_contact(
+                email=user_auth.email,
+                name=user_auth.name,
+                mobile=user_auth.mobile,
+                custom_fields={
+                    "ai_iq_test_taken": "true",
+                    "signup_source": "AI IQ Test Platform"
+                }
+            )
+            ghl_contact_id = contact_result.get("contact", {}).get("id")
+        except Exception as e:
+            print(f"GHL integration error: {e}")
+    
     users_db[user_id] = {
         "email": user_auth.email,
         "name": user_auth.name,
         "mobile": user_auth.mobile,
+        "ghl_contact_id": ghl_contact_id,
         "created_at": datetime.now()
     }
-    return {"user_id": user_id, "message": "User authenticated successfully"}
-
-class CreateTestResultRequest(BaseModel):
-    user_id: str
+    
+    return {
+        "user_id": user_id, 
+        "ghl_contact_id": ghl_contact_id,
+        "message": "User authenticated successfully"
+    }
 
 @app.post("/test-results", response_model=TestResultResponse)
 async def create_test_result(request: CreateTestResultRequest):
     if request.user_id not in users_db:
         raise HTTPException(status_code=404, detail="User not found")
     
-    result = create_sample_result(request.user_id)
+    user = users_db[request.user_id]
+    
+    test_parameters = None
+    ghl_contact_data = None
+    
+    if ghl_client.enabled and user.get("ghl_contact_id"):
+        try:
+            contact = await ghl_client.get_contact_by_email(user["email"])
+            if contact:
+                ghl_contact_data = contact
+                test_parameters = ghl_client.extract_test_parameters_from_contact(contact)
+        except Exception as e:
+            print(f"Error fetching GHL contact data: {e}")
+    
+    if request.test_parameters:
+        if test_parameters:
+            test_parameters.update(request.test_parameters)
+        else:
+            test_parameters = request.test_parameters
+    
+    result = test_engine.generate_dynamic_test_result(
+        user_id=request.user_id,
+        test_parameters=test_parameters,
+        ghl_contact_data=ghl_contact_data
+    )
+    
     result_id = str(uuid.uuid4())
     test_results_db[result_id] = result
     
-    user = users_db[request.user_id]
+    if ghl_client.enabled and user.get("ghl_contact_id"):
+        try:
+            ghl_fields = ghl_client.format_test_results_for_ghl({
+                "overall_score": result.overall_score,
+                "pain_points": {k: v.dict() for k, v in result.pain_points.items()},
+                "categories": {k: v.dict() for k, v in result.categories.items()},
+                "recommendations": result.recommendations,
+                "created_at": result.created_at
+            })
+            await ghl_client.update_contact_custom_fields(
+                user["ghl_contact_id"],
+                ghl_fields
+            )
+        except Exception as e:
+            print(f"Error updating GHL contact: {e}")
+    
     return TestResultResponse(
         id=result_id,
         user_email=user["email"],
         user_name=user["name"],
-        pain_points=result.pain_points,
-        categories=result.categories,
+        pain_points={k: v.dict() for k, v in result.pain_points.items()},
+        categories={k: v.dict() for k, v in result.categories.items()},
         overall_score=result.overall_score,
         recommendations=result.recommendations,
+        custom_sections={k: v.dict() for k, v in result.custom_sections.items()} if result.custom_sections else None,
+        report_metadata=result.report_metadata,
         created_at=result.created_at
     )
 
@@ -175,10 +145,12 @@ async def get_test_result(result_id: str):
         id=result_id,
         user_email=user["email"],
         user_name=user["name"],
-        pain_points=result.pain_points,
-        categories=result.categories,
+        pain_points={k: v.dict() for k, v in result.pain_points.items()},
+        categories={k: v.dict() for k, v in result.categories.items()},
         overall_score=result.overall_score,
         recommendations=result.recommendations,
+        custom_sections={k: v.dict() for k, v in result.custom_sections.items()} if result.custom_sections else None,
+        report_metadata=result.report_metadata,
         created_at=result.created_at
     )
 
@@ -197,3 +169,60 @@ async def get_user_test_results(user_id: str):
             })
     
     return {"user_id": user_id, "results": user_results}
+
+@app.post("/webhooks/ghl-form")
+async def handle_ghl_form_submission(webhook_data: GHLWebhookData):
+    """Handle form submissions from GHL and trigger AI IQ test"""
+    try:
+        user_auth = UserAuth(
+            email=webhook_data.email,
+            name=webhook_data.name,
+            mobile=webhook_data.phone
+        )
+        
+        auth_result = await login_user(user_auth)
+        
+        test_params = {}
+        for key, value in webhook_data.form_data.items():
+            if key in ["industry", "company_size", "current_ai_usage", "primary_challenges"]:
+                test_params[key] = TestParameter(
+                    name=key,
+                    value=value,
+                    weight=1.0,
+                    category="form_data"
+                )
+        
+        test_request = CreateTestResultRequest(
+            user_id=auth_result["user_id"],
+            test_parameters=test_params,
+            ghl_contact_data=webhook_data.custom_fields
+        )
+        
+        test_result = await create_test_result(test_request)
+        
+        return {
+            "status": "success",
+            "user_id": auth_result["user_id"],
+            "test_result_id": test_result.id,
+            "overall_score": test_result.overall_score
+        }
+        
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Error processing GHL form submission: {str(e)}")
+
+@app.get("/config/test-parameters")
+async def get_test_parameters_config():
+    """Get available test parameters and their configurations"""
+    return {
+        "available_parameters": [
+            {"name": "industry", "type": "string", "weight": 1.2, "category": "business"},
+            {"name": "company_size", "type": "string", "weight": 1.1, "category": "business"},
+            {"name": "current_ai_usage", "type": "string", "weight": 1.5, "category": "technology"},
+            {"name": "primary_challenges", "type": "array", "weight": 1.3, "category": "pain_points"},
+            {"name": "budget_range", "type": "string", "weight": 1.0, "category": "business"},
+            {"name": "tech_expertise", "type": "string", "weight": 1.2, "category": "technology"}
+        ],
+        "pain_point_weights": test_engine.config.pain_point_weights,
+        "category_weights": test_engine.config.category_weights,
+        "scoring_thresholds": test_engine.config.scoring_thresholds
+    }

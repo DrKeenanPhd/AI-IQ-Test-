@@ -1,0 +1,104 @@
+from pydantic import BaseModel, EmailStr
+from typing import Dict, List, Optional, Any, Union
+from datetime import datetime
+from enum import Enum
+
+class SeverityLevel(str, Enum):
+    LOW = "low"
+    MEDIUM = "medium"
+    HIGH = "high"
+    CRITICAL = "critical"
+
+class SectionType(str, Enum):
+    PAIN_POINT = "pain_point"
+    CATEGORY = "category"
+    CUSTOM = "custom"
+    RECOMMENDATION = "recommendation"
+
+class UserAuth(BaseModel):
+    email: EmailStr
+    name: str
+    mobile: str
+
+class GHLContact(BaseModel):
+    id: str
+    email: str
+    name: str
+    phone: str
+    custom_fields: Dict[str, Any] = {}
+    tags: List[str] = []
+
+class TestParameter(BaseModel):
+    name: str
+    value: Union[str, int, float, bool]
+    weight: float = 1.0
+    category: Optional[str] = None
+
+class DynamicSection(BaseModel):
+    title: str
+    content: Dict[str, Any]
+    display_order: int
+    section_type: SectionType
+    is_expandable: bool = True
+    min_height: Optional[str] = None
+    max_height: Optional[str] = None
+
+class PainPoint(BaseModel):
+    score: int
+    description: str
+    severity: SeverityLevel
+    recommendations: List[str]
+    impact_areas: List[str] = []
+    custom_data: Dict[str, Any] = {}
+
+class Category(BaseModel):
+    score: int
+    max_score: int
+    percentage: float
+    strengths: List[str]
+    weaknesses: List[str]
+    priority_actions: List[str]
+    custom_metrics: Dict[str, Any] = {}
+
+class DynamicTestResult(BaseModel):
+    user_id: str
+    pain_points: Dict[str, PainPoint]
+    categories: Dict[str, Category]
+    overall_score: int
+    recommendations: List[str]
+    custom_sections: Optional[Dict[str, DynamicSection]] = None
+    test_parameters: Optional[Dict[str, TestParameter]] = None
+    report_metadata: Optional[Dict[str, Any]] = None
+    created_at: datetime
+
+class TestResultResponse(BaseModel):
+    id: str
+    user_email: str
+    user_name: str
+    pain_points: Dict[str, Dict[str, Any]]
+    categories: Dict[str, Dict[str, Any]]
+    overall_score: int
+    recommendations: List[str]
+    custom_sections: Optional[Dict[str, Dict[str, Any]]] = None
+    report_metadata: Optional[Dict[str, Any]] = None
+    created_at: datetime
+
+class CreateTestResultRequest(BaseModel):
+    user_id: str
+    test_parameters: Optional[Dict[str, Any]] = None
+    ghl_contact_data: Optional[Dict[str, Any]] = None
+
+class GHLWebhookData(BaseModel):
+    contact_id: str
+    email: str
+    name: str
+    phone: str
+    form_data: Dict[str, Any]
+    custom_fields: Dict[str, Any] = {}
+
+class ConfigurationSettings(BaseModel):
+    pain_point_weights: Dict[str, float] = {}
+    category_weights: Dict[str, float] = {}
+    scoring_thresholds: Dict[str, int] = {}
+    dynamic_sections_enabled: bool = True
+    max_custom_sections: int = 10

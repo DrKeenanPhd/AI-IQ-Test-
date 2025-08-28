@@ -22,6 +22,8 @@ interface TestResult {
   categories: Record<string, any>
   overall_score: number
   recommendations: string[]
+  custom_sections?: Record<string, any>
+  report_metadata?: Record<string, any>
   created_at: string
 }
 
@@ -271,7 +273,13 @@ function App() {
             </Card>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-6 mb-12">
+          <div className={`grid gap-6 mb-12 ${
+            Object.keys(testResult.categories).length <= 3 
+              ? 'grid-cols-1 md:grid-cols-2 lg:grid-cols-3' 
+              : Object.keys(testResult.categories).length <= 5
+              ? 'grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5'
+              : 'grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4'
+          }`}>
             {Object.entries(testResult.categories).map(([key, category]: [string, any]) => (
               <Card key={key} className="bg-gray-800/50 border-gray-700 backdrop-blur-sm">
                 <CardHeader className="pb-3">
@@ -361,6 +369,40 @@ function App() {
               </div>
             </CardContent>
           </Card>
+
+          {testResult.custom_sections && Object.entries(testResult.custom_sections).map(([key, section]: [string, any]) => (
+            <Card key={key} className="bg-gray-800/50 border-gray-700 backdrop-blur-sm">
+              <CardHeader>
+                <CardTitle className="text-white flex items-center space-x-2">
+                  <Brain className="w-6 h-6 text-teal-400" />
+                  <span>{section.title}</span>
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="space-y-4">
+                  {Object.entries(section.content).map(([contentKey, contentValue]: [string, any]) => (
+                    <div key={contentKey}>
+                      <h4 className="text-lg font-semibold text-white mb-2 capitalize">
+                        {contentKey.replace(/_/g, ' ')}
+                      </h4>
+                      {Array.isArray(contentValue) ? (
+                        <ul className="space-y-2">
+                          {contentValue.map((item: string, idx: number) => (
+                            <li key={idx} className="flex items-start space-x-2">
+                              <CheckCircle className="w-4 h-4 text-teal-400 mt-1 flex-shrink-0" />
+                              <span className="text-gray-300">{item}</span>
+                            </li>
+                          ))}
+                        </ul>
+                      ) : (
+                        <p className="text-gray-300">{contentValue}</p>
+                      )}
+                    </div>
+                  ))}
+                </div>
+              </CardContent>
+            </Card>
+          ))}
         </main>
       </div>
     </div>
