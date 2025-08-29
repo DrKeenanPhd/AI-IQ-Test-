@@ -1,0 +1,293 @@
+{
+  "tool_name": "create_json_output",
+  "description": "Custom VAPI tool for generating structured JSON output from AI IQ test conversations",
+  "version": "1.0.0",
+  "vapi_function_config": {
+    "name": "create_json_output",
+    "description": "Create structured JSON output for AI IQ test results based on conversation analysis",
+    "parameters": {
+      "type": "object",
+      "properties": {
+        "contact_info": {
+          "type": "object",
+          "description": "Contact information gathered during the conversation",
+          "properties": {
+            "email": {
+              "type": "string",
+              "description": "Contact's email address"
+            },
+            "name": {
+              "type": "string", 
+              "description": "Contact's full name"
+            },
+            "phone": {
+              "type": "string",
+              "description": "Contact's phone number"
+            },
+            "company": {
+              "type": "string",
+              "description": "Contact's company name"
+            }
+          },
+          "required": ["email", "name"]
+        },
+        "test_metadata": {
+          "type": "object",
+          "description": "Metadata about the AI IQ test session",
+          "properties": {
+            "call_duration": {
+              "type": "number",
+              "description": "Duration of the call in minutes"
+            },
+            "completion_date": {
+              "type": "string",
+              "description": "ISO date when test was completed"
+            },
+            "agent_version": {
+              "type": "string",
+              "description": "Version of the AI agent used"
+            },
+            "confidence_score": {
+              "type": "number",
+              "minimum": 0,
+              "maximum": 1,
+              "description": "Confidence level in the assessment (0-1)"
+            }
+          }
+        },
+        "pain_points": {
+          "type": "object",
+          "description": "Analysis of the four key business pain points",
+          "properties": {
+            "cant_scale_without_burnout": {
+              "type": "object",
+              "description": "Assessment of scaling challenges and burnout risk",
+              "properties": {
+                "score": {
+                  "type": "integer",
+                  "minimum": 0,
+                  "maximum": 100,
+                  "description": "Severity score for this pain point"
+                },
+                "severity": {
+                  "type": "string",
+                  "enum": ["low", "medium", "high", "critical"],
+                  "description": "Severity level classification"
+                },
+                "description": {
+                  "type": "string",
+                  "description": "Detailed description of the pain point"
+                },
+                "evidence": {
+                  "type": "array",
+                  "items": {"type": "string"},
+                  "description": "Evidence supporting this assessment"
+                },
+                "impact_areas": {
+                  "type": "array",
+                  "items": {"type": "string"},
+                  "description": "Business areas most impacted"
+                }
+              },
+              "required": ["score", "severity", "description"]
+            },
+            "invisible_in_attention_landscape": {
+              "type": "object",
+              "description": "Assessment of visibility and attention capture challenges",
+              "properties": {
+                "score": {"type": "integer", "minimum": 0, "maximum": 100},
+                "severity": {"type": "string", "enum": ["low", "medium", "high", "critical"]},
+                "description": {"type": "string"},
+                "evidence": {"type": "array", "items": {"type": "string"}},
+                "impact_areas": {"type": "array", "items": {"type": "string"}}
+              },
+              "required": ["score", "severity", "description"]
+            },
+            "outgunned_by_ai_competitors": {
+              "type": "object",
+              "description": "Assessment of competitive disadvantage due to AI adoption gaps",
+              "properties": {
+                "score": {"type": "integer", "minimum": 0, "maximum": 100},
+                "severity": {"type": "string", "enum": ["low", "medium", "high", "critical"]},
+                "description": {"type": "string"},
+                "evidence": {"type": "array", "items": {"type": "string"}},
+                "impact_areas": {"type": "array", "items": {"type": "string"}}
+              },
+              "required": ["score", "severity", "description"]
+            },
+            "tech_gap_underusing_ai": {
+              "type": "object",
+              "description": "Assessment of technology gaps and AI underutilization",
+              "properties": {
+                "score": {"type": "integer", "minimum": 0, "maximum": 100},
+                "severity": {"type": "string", "enum": ["low", "medium", "high", "critical"]},
+                "description": {"type": "string"},
+                "evidence": {"type": "array", "items": {"type": "string"}},
+                "impact_areas": {"type": "array", "items": {"type": "string"}}
+              },
+              "required": ["score", "severity", "description"]
+            }
+          }
+        },
+        "categories": {
+          "type": "object",
+          "description": "Analysis across the five key business categories",
+          "properties": {
+            "website_form_function": {
+              "type": "object",
+              "description": "Website effectiveness and functionality assessment",
+              "properties": {
+                "score": {"type": "integer", "minimum": 0, "maximum": 100},
+                "max_score": {"type": "integer", "default": 100},
+                "percentage": {"type": "number", "minimum": 0, "maximum": 100},
+                "strengths": {"type": "array", "items": {"type": "string"}},
+                "weaknesses": {"type": "array", "items": {"type": "string"}},
+                "priority_actions": {"type": "array", "items": {"type": "string"}},
+                "detailed_analysis": {"type": "string"}
+              },
+              "required": ["score", "percentage"]
+            },
+            "social_media_effectiveness": {
+              "type": "object",
+              "description": "Social media strategy and execution assessment",
+              "properties": {
+                "score": {"type": "integer", "minimum": 0, "maximum": 100},
+                "max_score": {"type": "integer", "default": 100},
+                "percentage": {"type": "number", "minimum": 0, "maximum": 100},
+                "strengths": {"type": "array", "items": {"type": "string"}},
+                "weaknesses": {"type": "array", "items": {"type": "string"}},
+                "priority_actions": {"type": "array", "items": {"type": "string"}},
+                "detailed_analysis": {"type": "string"}
+              },
+              "required": ["score", "percentage"]
+            },
+            "digital_presence": {
+              "type": "object",
+              "description": "Overall digital presence and online visibility assessment",
+              "properties": {
+                "score": {"type": "integer", "minimum": 0, "maximum": 100},
+                "max_score": {"type": "integer", "default": 100},
+                "percentage": {"type": "number", "minimum": 0, "maximum": 100},
+                "strengths": {"type": "array", "items": {"type": "string"}},
+                "weaknesses": {"type": "array", "items": {"type": "string"}},
+                "priority_actions": {"type": "array", "items": {"type": "string"}},
+                "detailed_analysis": {"type": "string"}
+              },
+              "required": ["score", "percentage"]
+            },
+            "communication": {
+              "type": "object",
+              "description": "Communication strategy and effectiveness assessment",
+              "properties": {
+                "score": {"type": "integer", "minimum": 0, "maximum": 100},
+                "max_score": {"type": "integer", "default": 100},
+                "percentage": {"type": "number", "minimum": 0, "maximum": 100},
+                "strengths": {"type": "array", "items": {"type": "string"}},
+                "weaknesses": {"type": "array", "items": {"type": "string"}},
+                "priority_actions": {"type": "array", "items": {"type": "string"}},
+                "detailed_analysis": {"type": "string"}
+              },
+              "required": ["score", "percentage"]
+            },
+            "marketing": {
+              "type": "object",
+              "description": "Marketing strategy and execution assessment",
+              "properties": {
+                "score": {"type": "integer", "minimum": 0, "maximum": 100},
+                "max_score": {"type": "integer", "default": 100},
+                "percentage": {"type": "number", "minimum": 0, "maximum": 100},
+                "strengths": {"type": "array", "items": {"type": "string"}},
+                "weaknesses": {"type": "array", "items": {"type": "string"}},
+                "priority_actions": {"type": "array", "items": {"type": "string"}},
+                "detailed_analysis": {"type": "string"}
+              },
+              "required": ["score", "percentage"]
+            }
+          }
+        },
+        "overall_assessment": {
+          "type": "object",
+          "description": "Overall AI readiness assessment and recommendations",
+          "properties": {
+            "overall_score": {
+              "type": "integer",
+              "minimum": 0,
+              "maximum": 100,
+              "description": "Overall AI readiness score"
+            },
+            "ai_readiness_level": {
+              "type": "string",
+              "enum": ["beginner", "intermediate", "advanced", "expert"],
+              "description": "Classification of AI readiness level"
+            },
+            "priority_recommendations": {
+              "type": "array",
+              "items": {"type": "string"},
+              "description": "Top priority recommendations for improvement"
+            },
+            "quick_wins": {
+              "type": "array",
+              "items": {"type": "string"},
+              "description": "Quick wins that can be implemented immediately"
+            },
+            "long_term_strategy": {
+              "type": "array",
+              "items": {"type": "string"},
+              "description": "Long-term strategic recommendations"
+            },
+            "estimated_roi_timeline": {
+              "type": "string",
+              "description": "Estimated timeline for return on investment"
+            },
+            "next_steps": {
+              "type": "array",
+              "items": {"type": "string"},
+              "description": "Specific next steps to take"
+            }
+          },
+          "required": ["overall_score", "ai_readiness_level"]
+        },
+        "custom_insights": {
+          "type": "object",
+          "description": "Additional custom insights based on conversation",
+          "properties": {
+            "industry_specific_recommendations": {
+              "type": "array",
+              "items": {"type": "string"},
+              "description": "Recommendations specific to the contact's industry"
+            },
+            "competitive_analysis": {
+              "type": "string",
+              "description": "Analysis of competitive landscape"
+            },
+            "technology_stack_suggestions": {
+              "type": "array",
+              "items": {"type": "string"},
+              "description": "Suggested technology stack improvements"
+            },
+            "budget_considerations": {
+              "type": "string",
+              "description": "Budget-related considerations and recommendations"
+            },
+            "implementation_timeline": {
+              "type": "string",
+              "description": "Suggested timeline for implementing recommendations"
+            }
+          }
+        }
+      },
+      "required": ["contact_info", "overall_assessment"]
+    }
+  },
+  "usage_instructions": {
+    "step_1": "Copy the 'vapi_function_config' object into your VAPI agent's functions array",
+    "step_2": "Train your agent to call create_json_output() with structured data based on conversation",
+    "step_3": "Configure webhook URL to send results to your GHL integration endpoint",
+    "step_4": "Test with sample conversations to ensure proper JSON structure"
+  },
+  "example_agent_prompt": "When you complete an AI IQ assessment conversation, call the create_json_output function with a comprehensive analysis. Structure your assessment around the four pain points (scaling without burnout, visibility challenges, AI competition, tech gaps) and five categories (website, social media, digital presence, communication, marketing). Provide specific scores, evidence, and actionable recommendations based on the conversation.",
+  "integration_endpoints": {
+    "webhook_url": "https://your-backend.com/api/webhooks/vapi-result",
+    "ghl_sync_url": "https://hooks.gohighlevel.com/webhook/your-webhook-id"
+  }
+}

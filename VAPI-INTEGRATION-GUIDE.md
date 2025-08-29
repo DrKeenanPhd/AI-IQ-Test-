@@ -1,8 +1,8 @@
-# VAPI AI Agent Integration Guide
+# VAPI AI Agent Integration Guide - "create_json_output" Tool
 
 ## Complete Workflow: VAPI → GHL → Dynamic Site
 
-This guide explains the complete integration workflow for connecting your VAPI AI agent to GHL custom fields and dynamic site population.
+This guide explains the complete integration workflow for connecting your VAPI AI agent with the custom "create_json_output" tool to GHL custom fields and dynamic site population.
 
 ## Architecture Overview
 
@@ -15,7 +15,7 @@ This guide explains the complete integration workflow for connecting your VAPI A
 ## Phase 1: VAPI Agent Configuration
 
 ### 1.1 Agent Setup
-Configure your VAPI agent to output structured JSON using the schema in `/config/vapi_integration.json`:
+Configure your VAPI agent to use the "create_json_output" tool with the schema in `/config/create_json_output_tool.json`:
 
 ```javascript
 // VAPI Agent Configuration
@@ -23,7 +23,15 @@ Configure your VAPI agent to output structured JSON using the schema in `/config
   "name": "AI IQ Test Agent",
   "model": "gpt-4",
   "voice": "your-preferred-voice",
-  "functions": [],
+  "functions": [
+    {
+      "name": "create_json_output",
+      "description": "Create structured JSON output for AI IQ test results based on conversation analysis",
+      "parameters": {
+        // Copy the complete schema from config/create_json_output_tool.json
+      }
+    }
+  ],
   "endCallMessage": "Thank you for completing the AI IQ assessment. Your comprehensive report will be available shortly.",
   "endCallFunctionEnabled": true,
   "serverUrl": "https://hooks.gohighlevel.com/webhook/your-webhook-id",
@@ -31,8 +39,8 @@ Configure your VAPI agent to output structured JSON using the schema in `/config
 }
 ```
 
-### 1.2 JSON Output Schema
-Your VAPI agent should generate JSON matching this structure:
+### 1.2 Using the create_json_output Tool
+Your VAPI agent should call the create_json_output function with JSON matching this structure:
 
 ```json
 {

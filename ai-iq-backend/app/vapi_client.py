@@ -30,7 +30,7 @@ class VAPIClient:
         }
     
     async def process_vapi_webhook(self, webhook_data: Dict[str, Any]) -> Dict[str, Any]:
-        """Process incoming VAPI webhook with AI IQ test results"""
+        """Process incoming VAPI webhook with create_json_output tool results"""
         try:
             contact_info = webhook_data.get("contact_info", {})
             email = contact_info.get("email")
@@ -67,7 +67,7 @@ class VAPIClient:
         email: str, 
         name: str
     ) -> DynamicTestResult:
-        """Convert VAPI JSON output to internal DynamicTestResult format"""
+        """Convert create_json_output tool results to internal DynamicTestResult format"""
         
         pain_points_data = vapi_data.get("pain_points", {})
         pain_points = {}
@@ -148,7 +148,7 @@ class VAPIClient:
         )
     
     def format_vapi_results_for_ghl(self, vapi_data: Dict[str, Any]) -> Dict[str, Any]:
-        """Format VAPI results for GHL custom fields"""
+        """Format create_json_output tool results for GHL custom fields"""
         ghl_fields = {}
         
         ghl_fields["ai_iq_test_results"] = json.dumps(vapi_data)

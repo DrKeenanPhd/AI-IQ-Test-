@@ -1,9 +1,10 @@
 {
-  "vapi_agent_config": {
+  "create_json_output": {
     "name": "AI IQ Test Agent",
     "description": "Conducts comprehensive AI readiness assessment for businesses",
     "output_format": "structured_json",
     "webhook_url": "https://hooks.gohighlevel.com/webhook/your-webhook-id",
+    "function_name": "create_json_output",
     "response_schema": {
       "type": "object",
       "properties": {
