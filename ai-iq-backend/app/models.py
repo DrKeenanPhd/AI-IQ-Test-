@@ -102,3 +102,37 @@ class ConfigurationSettings(BaseModel):
     scoring_thresholds: Dict[str, int] = {}
     dynamic_sections_enabled: bool = True
     max_custom_sections: int = 10
+
+class SubscriptionStatus(str, Enum):
+    TRIAL = "trial"
+    ACTIVE = "active"
+    CANCELLED = "cancelled"
+    EXPIRED = "expired"
+    PAST_DUE = "past_due"
+
+class UserSubscription(BaseModel):
+    user_id: str
+    subscription_status: SubscriptionStatus = SubscriptionStatus.TRIAL
+    trial_start_date: Optional[datetime] = None
+    trial_end_date: Optional[datetime] = None
+    stripe_customer_id: Optional[str] = None
+    stripe_subscription_id: Optional[str] = None
+    current_period_start: Optional[datetime] = None
+    current_period_end: Optional[datetime] = None
+    created_at: datetime
+
+class CreateSubscriptionRequest(BaseModel):
+    user_id: str
+    payment_method_id: str
+    
+class SubscriptionResponse(BaseModel):
+    subscription_id: str
+    client_secret: Optional[str] = None
+    status: str
+    trial_end: Optional[datetime] = None
+    current_period_end: Optional[datetime] = None
+
+class StripeWebhookEvent(BaseModel):
+    id: str
+    type: str
+    data: Dict[str, Any]

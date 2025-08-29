@@ -1,0 +1,196 @@
+{
+  "vapi_agent_config": {
+    "name": "AI IQ Test Agent",
+    "description": "Conducts comprehensive AI readiness assessment for businesses",
+    "output_format": "structured_json",
+    "webhook_url": "https://hooks.gohighlevel.com/webhook/your-webhook-id",
+    "response_schema": {
+      "type": "object",
+      "properties": {
+        "contact_info": {
+          "type": "object",
+          "properties": {
+            "email": {"type": "string"},
+            "name": {"type": "string"},
+            "phone": {"type": "string"},
+            "company": {"type": "string"}
+          }
+        },
+        "test_metadata": {
+          "type": "object",
+          "properties": {
+            "call_duration": {"type": "number"},
+            "completion_date": {"type": "string"},
+            "agent_version": {"type": "string"},
+            "confidence_score": {"type": "number", "minimum": 0, "maximum": 1}
+          }
+        },
+        "pain_points": {
+          "type": "object",
+          "properties": {
+            "cant_scale_without_burnout": {
+              "type": "object",
+              "properties": {
+                "score": {"type": "integer", "minimum": 0, "maximum": 100},
+                "severity": {"type": "string", "enum": ["low", "medium", "high", "critical"]},
+                "description": {"type": "string"},
+                "evidence": {"type": "array", "items": {"type": "string"}},
+                "impact_areas": {"type": "array", "items": {"type": "string"}}
+              }
+            },
+            "invisible_in_attention_landscape": {
+              "type": "object",
+              "properties": {
+                "score": {"type": "integer", "minimum": 0, "maximum": 100},
+                "severity": {"type": "string", "enum": ["low", "medium", "high", "critical"]},
+                "description": {"type": "string"},
+                "evidence": {"type": "array", "items": {"type": "string"}},
+                "impact_areas": {"type": "array", "items": {"type": "string"}}
+              }
+            },
+            "outgunned_by_ai_competitors": {
+              "type": "object",
+              "properties": {
+                "score": {"type": "integer", "minimum": 0, "maximum": 100},
+                "severity": {"type": "string", "enum": ["low", "medium", "high", "critical"]},
+                "description": {"type": "string"},
+                "evidence": {"type": "array", "items": {"type": "string"}},
+                "impact_areas": {"type": "array", "items": {"type": "string"}}
+              }
+            },
+            "tech_gap_underusing_ai": {
+              "type": "object",
+              "properties": {
+                "score": {"type": "integer", "minimum": 0, "maximum": 100},
+                "severity": {"type": "string", "enum": ["low", "medium", "high", "critical"]},
+                "description": {"type": "string"},
+                "evidence": {"type": "array", "items": {"type": "string"}},
+                "impact_areas": {"type": "array", "items": {"type": "string"}}
+              }
+            }
+          }
+        },
+        "categories": {
+          "type": "object",
+          "properties": {
+            "website_form_function": {
+              "type": "object",
+              "properties": {
+                "score": {"type": "integer", "minimum": 0, "maximum": 100},
+                "max_score": {"type": "integer", "default": 100},
+                "percentage": {"type": "number", "minimum": 0, "maximum": 100},
+                "strengths": {"type": "array", "items": {"type": "string"}},
+                "weaknesses": {"type": "array", "items": {"type": "string"}},
+                "priority_actions": {"type": "array", "items": {"type": "string"}},
+                "detailed_analysis": {"type": "string"}
+              }
+            },
+            "social_media_effectiveness": {
+              "type": "object",
+              "properties": {
+                "score": {"type": "integer", "minimum": 0, "maximum": 100},
+                "max_score": {"type": "integer", "default": 100},
+                "percentage": {"type": "number", "minimum": 0, "maximum": 100},
+                "strengths": {"type": "array", "items": {"type": "string"}},
+                "weaknesses": {"type": "array", "items": {"type": "string"}},
+                "priority_actions": {"type": "array", "items": {"type": "string"}},
+                "detailed_analysis": {"type": "string"}
+              }
+            },
+            "digital_presence": {
+              "type": "object",
+              "properties": {
+                "score": {"type": "integer", "minimum": 0, "maximum": 100},
+                "max_score": {"type": "integer", "default": 100},
+                "percentage": {"type": "number", "minimum": 0, "maximum": 100},
+                "strengths": {"type": "array", "items": {"type": "string"}},
+                "weaknesses": {"type": "array", "items": {"type": "string"}},
+                "priority_actions": {"type": "array", "items": {"type": "string"}},
+                "detailed_analysis": {"type": "string"}
+              }
+            },
+            "communication": {
+              "type": "object",
+              "properties": {
+                "score": {"type": "integer", "minimum": 0, "maximum": 100},
+                "max_score": {"type": "integer", "default": 100},
+                "percentage": {"type": "number", "minimum": 0, "maximum": 100},
+                "strengths": {"type": "array", "items": {"type": "string"}},
+                "weaknesses": {"type": "array", "items": {"type": "string"}},
+                "priority_actions": {"type": "array", "items": {"type": "string"}},
+                "detailed_analysis": {"type": "string"}
+              }
+            },
+            "marketing": {
+              "type": "object",
+              "properties": {
+                "score": {"type": "integer", "minimum": 0, "maximum": 100},
+                "max_score": {"type": "integer", "default": 100},
+                "percentage": {"type": "number", "minimum": 0, "maximum": 100},
+                "strengths": {"type": "array", "items": {"type": "string"}},
+                "weaknesses": {"type": "array", "items": {"type": "string"}},
+                "priority_actions": {"type": "array", "items": {"type": "string"}},
+                "detailed_analysis": {"type": "string"}
+              }
+            }
+          }
+        },
+        "overall_assessment": {
+          "type": "object",
+          "properties": {
+            "overall_score": {"type": "integer", "minimum": 0, "maximum": 100},
+            "ai_readiness_level": {"type": "string", "enum": ["beginner", "intermediate", "advanced", "expert"]},
+            "priority_recommendations": {"type": "array", "items": {"type": "string"}},
+            "quick_wins": {"type": "array", "items": {"type": "string"}},
+            "long_term_strategy": {"type": "array", "items": {"type": "string"}},
+            "estimated_roi_timeline": {"type": "string"},
+            "next_steps": {"type": "array", "items": {"type": "string"}}
+          }
+        },
+        "custom_insights": {
+          "type": "object",
+          "properties": {
+            "industry_specific_recommendations": {"type": "array", "items": {"type": "string"}},
+            "competitive_analysis": {"type": "string"},
+            "technology_stack_suggestions": {"type": "array", "items": {"type": "string"}},
+            "budget_considerations": {"type": "string"},
+            "implementation_timeline": {"type": "string"}
+          }
+        }
+      }
+    }
+  },
+  "ghl_field_mapping": {
+    "ai_iq_test_results": "Full JSON payload from VAPI",
+    "ai_iq_overall_score": "overall_assessment.overall_score",
+    "ai_iq_readiness_level": "overall_assessment.ai_readiness_level",
+    "ai_iq_test_date": "test_metadata.completion_date",
+    "ai_iq_call_duration": "test_metadata.call_duration",
+    "ai_iq_confidence_score": "test_metadata.confidence_score",
+    "ai_iq_cant_scale_score": "pain_points.cant_scale_without_burnout.score",
+    "ai_iq_invisible_score": "pain_points.invisible_in_attention_landscape.score",
+    "ai_iq_outgunned_score": "pain_points.outgunned_by_ai_competitors.score",
+    "ai_iq_tech_gap_score": "pain_points.tech_gap_underusing_ai.score",
+    "ai_iq_website_score": "categories.website_form_function.score",
+    "ai_iq_social_score": "categories.social_media_effectiveness.score",
+    "ai_iq_digital_score": "categories.digital_presence.score",
+    "ai_iq_communication_score": "categories.communication.score",
+    "ai_iq_marketing_score": "categories.marketing.score",
+    "ai_iq_priority_actions": "overall_assessment.priority_recommendations",
+    "ai_iq_quick_wins": "overall_assessment.quick_wins",
+    "ai_iq_next_steps": "overall_assessment.next_steps"
+  },
+  "webhook_configuration": {
+    "ghl_webhook_url": "https://hooks.gohighlevel.com/webhook/your-webhook-id",
+    "site_webhook_url": "https://your-site.com/api/webhooks/vapi-result",
+    "authentication": {
+      "type": "bearer_token",
+      "header_name": "Authorization"
+    },
+    "retry_policy": {
+      "max_retries": 3,
+      "retry_delay_seconds": 5,
+      "exponential_backoff": true
+    }
+  }
+}
