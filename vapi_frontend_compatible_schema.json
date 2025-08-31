@@ -1,0 +1,301 @@
+{
+  "type": "object",
+  "properties": {
+    "contact_id": {
+      "type": "string",
+      "description": "Contact identifier for GHL and report association"
+    },
+    "session_metadata": {
+      "type": "object",
+      "description": "Voice call and session metadata",
+      "properties": {
+        "vapi_call_id": {
+          "type": "string",
+          "description": "VAPI call session identifier"
+        },
+        "call_duration": {
+          "type": "number",
+          "description": "Duration of voice call in seconds"
+        },
+        "agent_confidence_score": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 100,
+          "description": "Agent's confidence in the analysis (0-100)"
+        },
+        "return_user": {
+          "type": "boolean",
+          "description": "Whether this is a returning user with previous test history"
+        },
+        "previous_test_count": {
+          "type": "number",
+          "description": "Number of previous tests completed by this contact"
+        },
+        "user_website_url": {
+          "type": "string",
+          "description": "User's website URL analyzed during the call"
+        }
+      },
+      "required": ["vapi_call_id"]
+    },
+    "voice_summary": {
+      "type": "object",
+      "description": "Voice interaction summaries and highlights",
+      "properties": {
+        "verbal_summary": {
+          "type": "string",
+          "description": "Brief verbal summary provided to the client during the call"
+        },
+        "conversation_highlights": {
+          "type": "array",
+          "items": {"type": "string"},
+          "description": "Key insights and quotes from the conversation"
+        },
+        "call_transcript_summary": {
+          "type": "string",
+          "description": "Summary of the key points discussed during the call"
+        },
+        "agent_recommendations_spoken": {
+          "type": "array",
+          "items": {"type": "string"},
+          "description": "Specific recommendations the agent provided verbally"
+        },
+        "client_concerns_expressed": {
+          "type": "array",
+          "items": {"type": "string"},
+          "description": "Main concerns or pain points the client expressed during the call"
+        }
+      }
+    },
+    "overall_score": {
+      "type": "number",
+      "description": "Overall AI IQ score (0-100) calculated by the agent",
+      "minimum": 0,
+      "maximum": 100
+    },
+    "pain_points": {
+      "type": "object",
+      "description": "Analysis organized by the 4 Pain Points with agent-determined scores and descriptions",
+      "properties": {
+        "cant_scale_without_burnout": {
+          "type": "object",
+          "properties": {
+            "score": {"type": "number", "minimum": 0, "maximum": 10},
+            "description": {"type": "string"},
+            "severity": {"type": "string", "enum": ["low", "medium", "high", "critical"]},
+            "recommendations": {"type": "array", "items": {"type": "string"}},
+            "impact_areas": {"type": "array", "items": {"type": "string"}}
+          },
+          "required": ["score", "description", "severity"]
+        },
+        "invisible_attention_landscape": {
+          "type": "object",
+          "properties": {
+            "score": {"type": "number", "minimum": 0, "maximum": 10},
+            "description": {"type": "string"},
+            "severity": {"type": "string", "enum": ["low", "medium", "high", "critical"]},
+            "recommendations": {"type": "array", "items": {"type": "string"}},
+            "impact_areas": {"type": "array", "items": {"type": "string"}}
+          },
+          "required": ["score", "description", "severity"]
+        },
+        "outgunned_by_competitors": {
+          "type": "object",
+          "properties": {
+            "score": {"type": "number", "minimum": 0, "maximum": 10},
+            "description": {"type": "string"},
+            "severity": {"type": "string", "enum": ["low", "medium", "high", "critical"]},
+            "recommendations": {"type": "array", "items": {"type": "string"}},
+            "impact_areas": {"type": "array", "items": {"type": "string"}}
+          },
+          "required": ["score", "description", "severity"]
+        },
+        "tech_gap_ai_advantages": {
+          "type": "object",
+          "properties": {
+            "score": {"type": "number", "minimum": 0, "maximum": 10},
+            "description": {"type": "string"},
+            "severity": {"type": "string", "enum": ["low", "medium", "high", "critical"]},
+            "recommendations": {"type": "array", "items": {"type": "string"}},
+            "impact_areas": {"type": "array", "items": {"type": "string"}}
+          },
+          "required": ["score", "description", "severity"]
+        }
+      },
+      "required": ["cant_scale_without_burnout", "invisible_attention_landscape", "outgunned_by_competitors", "tech_gap_ai_advantages"]
+    },
+    "categories": {
+      "type": "object",
+      "description": "Analysis organized by the 5 Contexts with agent-determined scores and assessments",
+      "properties": {
+        "website_form_function": {
+          "type": "object",
+          "properties": {
+            "score": {"type": "number", "minimum": 0},
+            "max_score": {"type": "number", "minimum": 1},
+            "percentage": {"type": "number", "minimum": 0, "maximum": 100},
+            "strengths": {"type": "array", "items": {"type": "string"}},
+            "weaknesses": {"type": "array", "items": {"type": "string"}},
+            "priority_actions": {"type": "array", "items": {"type": "string"}}
+          },
+          "required": ["score", "max_score", "percentage", "strengths", "weaknesses", "priority_actions"]
+        },
+        "social_media_effectiveness": {
+          "type": "object",
+          "properties": {
+            "score": {"type": "number", "minimum": 0},
+            "max_score": {"type": "number", "minimum": 1},
+            "percentage": {"type": "number", "minimum": 0, "maximum": 100},
+            "strengths": {"type": "array", "items": {"type": "string"}},
+            "weaknesses": {"type": "array", "items": {"type": "string"}},
+            "priority_actions": {"type": "array", "items": {"type": "string"}}
+          },
+          "required": ["score", "max_score", "percentage", "strengths", "weaknesses", "priority_actions"]
+        },
+        "digital_presence": {
+          "type": "object",
+          "properties": {
+            "score": {"type": "number", "minimum": 0},
+            "max_score": {"type": "number", "minimum": 1},
+            "percentage": {"type": "number", "minimum": 0, "maximum": 100},
+            "strengths": {"type": "array", "items": {"type": "string"}},
+            "weaknesses": {"type": "array", "items": {"type": "string"}},
+            "priority_actions": {"type": "array", "items": {"type": "string"}}
+          },
+          "required": ["score", "max_score", "percentage", "strengths", "weaknesses", "priority_actions"]
+        },
+        "communication": {
+          "type": "object",
+          "properties": {
+            "score": {"type": "number", "minimum": 0},
+            "max_score": {"type": "number", "minimum": 1},
+            "percentage": {"type": "number", "minimum": 0, "maximum": 100},
+            "strengths": {"type": "array", "items": {"type": "string"}},
+            "weaknesses": {"type": "array", "items": {"type": "string"}},
+            "priority_actions": {"type": "array", "items": {"type": "string"}}
+          },
+          "required": ["score", "max_score", "percentage", "strengths", "weaknesses", "priority_actions"]
+        },
+        "marketing": {
+          "type": "object",
+          "properties": {
+            "score": {"type": "number", "minimum": 0},
+            "max_score": {"type": "number", "minimum": 1},
+            "percentage": {"type": "number", "minimum": 0, "maximum": 100},
+            "strengths": {"type": "array", "items": {"type": "string"}},
+            "weaknesses": {"type": "array", "items": {"type": "string"}},
+            "priority_actions": {"type": "array", "items": {"type": "string"}}
+          },
+          "required": ["score", "max_score", "percentage", "strengths", "weaknesses", "priority_actions"]
+        }
+      },
+      "required": ["website_form_function", "social_media_effectiveness", "digital_presence", "communication", "marketing"]
+    },
+    "recommendations": {
+      "type": "array",
+      "items": {"type": "string"},
+      "description": "Strategic recommendations generated by the agent"
+    },
+    "api_data_sources": {
+      "type": "object",
+      "description": "Summary of data sources and tools used during analysis",
+      "properties": {
+        "tools_used": {
+          "type": "array",
+          "items": {"type": "string"},
+          "description": "List of API tools called during the analysis (e.g., 'Moz SEO', 'BuiltWith', 'SerpAPI')"
+        },
+        "data_quality_score": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 100,
+          "description": "Agent's assessment of data quality and completeness (0-100)"
+        },
+        "analysis_depth": {
+          "type": "string",
+          "enum": ["basic", "standard", "comprehensive", "deep-dive"],
+          "description": "Level of analysis performed based on available data"
+        },
+        "missing_data_notes": {
+          "type": "array",
+          "items": {"type": "string"},
+          "description": "Notes about any missing or unavailable data that could improve the analysis"
+        }
+      }
+    },
+    "subscription_recommendations": {
+      "type": "object",
+      "description": "AI IQ subscription and support recommendations",
+      "properties": {
+        "ai_iq_subscription_recommendation": {
+          "type": "string",
+          "description": "Agent's recommendation for AI IQ Business Analysis support tool subscription"
+        },
+        "vip_support_recommendation": {
+          "type": "string",
+          "description": "Agent's recommendation for VIP support engineer AI with human support tool"
+        },
+        "priority_level": {
+          "type": "string",
+          "enum": ["low", "medium", "high", "urgent"],
+          "description": "Recommended priority level for implementing AI solutions"
+        },
+        "estimated_roi_timeline": {
+          "type": "string",
+          "description": "Agent's estimate of when ROI improvements could be seen"
+        }
+      }
+    },
+    "custom_sections": {
+      "type": "object",
+      "description": "Additional flexible sections the agent can create with any structure",
+      "additionalProperties": {
+        "type": "object",
+        "properties": {
+          "title": {"type": "string"},
+          "content": {
+            "type": "object",
+            "additionalProperties": true,
+            "description": "Any content structure the agent determines"
+          },
+          "display_priority": {
+            "type": "number",
+            "minimum": 1,
+            "maximum": 10,
+            "description": "Priority for displaying this section (1=highest, 10=lowest)"
+          }
+        },
+        "required": ["title", "content"]
+      }
+    },
+    "report_metadata": {
+      "type": "object",
+      "description": "Report generation and display metadata",
+      "properties": {
+        "generated_timestamp": {
+          "type": "string",
+          "description": "ISO timestamp when the report was generated"
+        },
+        "report_version": {
+          "type": "string",
+          "description": "Version of the report schema used"
+        },
+        "frontend_display_mode": {
+          "type": "string",
+          "enum": ["summary", "detailed", "comprehensive"],
+          "description": "Recommended display mode for the frontend"
+        },
+        "estimated_read_time": {
+          "type": "number",
+          "description": "Estimated time to read the full report in minutes"
+        },
+        "report_url": {
+          "type": "string",
+          "description": "Unique URL for accessing this report (generated by system)"
+        }
+      },
+      "additionalProperties": true
+    }
+  },
+  "required": ["contact_id", "overall_score", "pain_points", "categories", "recommendations", "session_metadata"]
+}
