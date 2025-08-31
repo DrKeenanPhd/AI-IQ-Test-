@@ -155,7 +155,7 @@ function App() {
     if (!sessionData) return null;
     
     return (
-      <Card className="bg-gray-800/50 border-gray-700 backdrop-blur-sm">
+      <Card className="bg-black/80 border-gray-800 backdrop-blur-sm">
         <CardHeader>
           <CardTitle className="text-white flex items-center space-x-2">
             <Clock className="w-5 h-5 text-teal-400" />
@@ -201,7 +201,7 @@ function App() {
     if (!voiceData) return null;
     
     return (
-      <Card className="bg-gray-800/50 border-gray-700 backdrop-blur-sm">
+      <Card className="bg-black/80 border-gray-800 backdrop-blur-sm">
         <CardHeader>
           <CardTitle className="text-white flex items-center space-x-2">
             <Mic className="w-5 h-5 text-purple-400" />
@@ -252,10 +252,10 @@ function App() {
     if (!apiData) return null;
     
     return (
-      <Card className="bg-gray-800/50 border-gray-700 backdrop-blur-sm">
+      <Card className="bg-black/80 border-gray-800 backdrop-blur-sm">
         <CardHeader>
           <CardTitle className="text-white flex items-center space-x-2">
-            <Brain className="w-5 h-5 text-teal-400" />
+            <img src="/logo.png" alt="AiAlive" className="w-5 h-5" />
             <span>Analysis Sources</span>
           </CardTitle>
         </CardHeader>
@@ -352,14 +352,14 @@ function App() {
 
   if (!isAuthenticated) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900">
+      <div className="min-h-screen bg-black">
         <div className="absolute inset-0 bg-gradient-to-r from-teal-500/10 via-purple-500/10 to-teal-500/10"></div>
         
         <div className="relative z-10 flex items-center justify-center min-h-screen p-4">
-          <Card className="w-full max-w-md bg-gray-800/50 border-gray-700 backdrop-blur-sm">
+          <Card className="w-full max-w-md bg-black/80 border-gray-800 backdrop-blur-sm">
             <CardHeader className="text-center">
               <div className="flex items-center justify-center mb-4">
-                <Brain className="w-12 h-12 text-teal-400" />
+                <img src="/logo.png" alt="AiAlive" className="w-10 h-10" />
               </div>
               <CardTitle className="text-2xl font-bold text-white">AI IQ Test Results</CardTitle>
               <CardDescription className="text-gray-300">
@@ -375,7 +375,7 @@ function App() {
                     value={authForm.email}
                     onChange={(e) => setAuthForm({...authForm, email: e.target.value})}
                     required
-                    className="bg-gray-700/50 border-gray-600 text-white placeholder-gray-400"
+                    className="bg-black/50 border-gray-800 text-white placeholder-gray-400"
                   />
                 </div>
                 <div>
@@ -385,7 +385,7 @@ function App() {
                     value={authForm.name}
                     onChange={(e) => setAuthForm({...authForm, name: e.target.value})}
                     required
-                    className="bg-gray-700/50 border-gray-600 text-white placeholder-gray-400"
+                    className="bg-black/50 border-gray-800 text-white placeholder-gray-400"
                   />
                 </div>
                 <div>
@@ -395,7 +395,7 @@ function App() {
                     value={authForm.mobile}
                     onChange={(e) => setAuthForm({...authForm, mobile: e.target.value})}
                     required
-                    className="bg-gray-700/50 border-gray-600 text-white placeholder-gray-400"
+                    className="bg-black/50 border-gray-800 text-white placeholder-gray-400"
                   />
                 </div>
                 {error && (
@@ -420,9 +420,9 @@ function App() {
 
   if (!testResult) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900 flex items-center justify-center">
+      <div className="min-h-screen bg-black flex items-center justify-center">
         <div className="text-center text-white">
-          <Brain className="w-16 h-16 text-teal-400 mx-auto mb-4 animate-pulse" />
+          <img src="/logo.png" alt="AiAlive" className="w-16 h-16 mx-auto mb-4 animate-pulse" />
           <h2 className="text-2xl font-bold mb-2">Generating Your AI IQ Report</h2>
           <p className="text-gray-300">Please wait while we analyze your data...</p>
         </div>
@@ -431,15 +431,15 @@ function App() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900">
+    <div className="min-h-screen bg-black">
       <div className="absolute inset-0 bg-gradient-to-r from-teal-500/5 via-purple-500/5 to-teal-500/5"></div>
       
       <div className="relative z-10">
-        <header className="border-b border-gray-700/50 bg-gray-800/30 backdrop-blur-sm">
+        <header className="border-b border-gray-800/50 bg-black/30 backdrop-blur-sm">
           <div className="max-w-7xl mx-auto px-4 py-6">
             <div className="flex items-center justify-between">
               <div className="flex items-center space-x-3">
-                <Brain className="w-8 h-8 text-teal-400" />
+                <img src="/logo.png" alt="AiAlive" className="w-8 h-8" />
                 <h1 className="text-2xl font-bold text-white">AI IQ Test Results</h1>
               </div>
               <div className="text-right">
@@ -463,7 +463,7 @@ function App() {
 
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 mb-12">
             <div className="lg:col-span-2 space-y-8">
-              <Card className="bg-gray-800/50 border-gray-700 backdrop-blur-sm">
+              <Card className="bg-black/80 border-gray-800 backdrop-blur-sm">
                 <CardHeader>
                   <CardTitle className="text-white flex items-center space-x-2">
                     <AlertTriangle className="w-6 h-6 text-yellow-400" />
@@ -494,7 +494,7 @@ function App() {
                   : 'grid-cols-1 md:grid-cols-2 lg:grid-cols-3'
               }`}>
                 {Object.entries(testResult.categories).map(([key, category]: [string, any]) => (
-                  <Card key={key} className="bg-gray-800/50 border-gray-700 backdrop-blur-sm">
+                  <Card key={key} className="bg-black/80 border-gray-800 backdrop-blur-sm">
                     <CardHeader className="pb-3">
                       <div className="flex items-center space-x-2 mb-2">
                         {getCategoryIcon(key)}
@@ -541,7 +541,7 @@ function App() {
             </div>
 
             <div className="space-y-6">
-              <Card className="bg-gray-800/50 border-gray-700 backdrop-blur-sm">
+              <Card className="bg-black/80 border-gray-800 backdrop-blur-sm">
                 <CardHeader>
                   <CardTitle className="text-white">AI Assistant</CardTitle>
                   <CardDescription className="text-gray-300">
@@ -550,7 +550,7 @@ function App() {
                 </CardHeader>
                 <CardContent>
                   <div className="bg-gray-700/30 border-2 border-dashed border-gray-600 rounded-lg p-6 text-center">
-                    <Brain className="w-10 h-10 text-teal-400 mx-auto mb-3" />
+                    <img src="/logo.png" alt="AiAlive" className="w-10 h-10 mx-auto mb-3" />
                     <p className="text-gray-300 text-sm mb-3">VAPI Widget Here</p>
                     <p className="text-xs text-gray-400">
                       Insert your VAPI HTML code here to activate your AI assistant
@@ -567,7 +567,7 @@ function App() {
           </div>
 
 
-          <Card className="bg-gray-800/50 border-gray-700 backdrop-blur-sm">
+          <Card className="bg-black/80 border-gray-800 backdrop-blur-sm">
             <CardHeader>
               <CardTitle className="text-white flex items-center space-x-2">
                 <Target className="w-6 h-6 text-teal-400" />
@@ -612,10 +612,10 @@ function App() {
           </Card>
 
           {testResult.custom_sections && Object.entries(testResult.custom_sections).map(([key, section]: [string, any]) => (
-            <Card key={key} className="bg-gray-800/50 border-gray-700 backdrop-blur-sm">
+            <Card key={key} className="bg-black/80 border-gray-800 backdrop-blur-sm">
               <CardHeader>
                 <CardTitle className="text-white flex items-center space-x-2">
-                  <Brain className="w-6 h-6 text-teal-400" />
+                  <img src="/logo.png" alt="AiAlive" className="w-6 h-6" />
                   <span>{section.title}</span>
                 </CardTitle>
               </CardHeader>
