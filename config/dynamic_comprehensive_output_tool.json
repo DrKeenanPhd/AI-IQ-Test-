@@ -1,0 +1,276 @@
+{
+  "tool_name": "create_comprehensive_dynamic_output",
+  "description": "Dynamic VAPI tool for generating comprehensive AI IQ reports with flexible JSON structure based on multiple API integrations",
+  "version": "2.0.0",
+  "vapi_function_config": {
+    "name": "create_comprehensive_dynamic_output",
+    "description": "Generate a comprehensive, dynamic JSON report combining AI IQ test results with data from all integrated APIs and tools",
+    "parameters": {
+      "type": "object",
+      "properties": {
+        "contact_info": {
+          "type": "object",
+          "description": "Contact information gathered during conversation",
+          "properties": {
+            "email": {"type": "string"},
+            "name": {"type": "string"},
+            "phone": {"type": "string"},
+            "company": {"type": "string"},
+            "industry": {"type": "string"},
+            "company_size": {"type": "string"}
+          },
+          "required": ["email", "name"]
+        },
+        "ai_iq_test_results": {
+          "type": "object",
+          "description": "Core AI IQ test assessment results",
+          "properties": {
+            "overall_score": {"type": "integer", "minimum": 0, "maximum": 200},
+            "ai_readiness_level": {
+              "type": "string",
+              "enum": ["beginner", "intermediate", "advanced", "expert"]
+            },
+            "brief_explanation": {
+              "type": "string",
+              "description": "Brief explanation of the AI IQ score and readiness level"
+            }
+          },
+          "required": ["overall_score", "ai_readiness_level", "brief_explanation"]
+        },
+        "verbal_summary": {
+          "type": "object",
+          "description": "Summary content to be presented verbally to the user",
+          "properties": {
+            "key_findings": {
+              "type": "array",
+              "items": {"type": "string"},
+              "description": "3-5 key findings to present verbally"
+            },
+            "priority_recommendations": {
+              "type": "array",
+              "items": {"type": "string"},
+              "description": "Top 3 priority recommendations for verbal presentation"
+            },
+            "next_steps": {
+              "type": "string",
+              "description": "Clear next steps to communicate verbally"
+            }
+          },
+          "required": ["key_findings", "priority_recommendations", "next_steps"]
+        },
+        "pain_points_analysis": {
+          "type": "object",
+          "description": "Analysis organized by the 4 core pain points",
+          "properties": {
+            "cant_scale_without_burning_out": {
+              "type": "object",
+              "properties": {
+                "severity_score": {"type": "integer", "minimum": 0, "maximum": 100},
+                "severity_level": {"type": "string", "enum": ["low", "medium", "high", "critical"]},
+                "assessment": {"type": "string"},
+                "api_data_insights": {
+                  "type": "object",
+                  "description": "Dynamic insights from API integrations related to this pain point",
+                  "additionalProperties": true
+                },
+                "recommendations": {"type": "array", "items": {"type": "string"}},
+                "context_breakdown": {
+                  "type": "object",
+                  "description": "How this pain point manifests across the 5 contexts",
+                  "additionalProperties": true
+                }
+              },
+              "required": ["severity_score", "severity_level", "assessment"]
+            },
+            "invisible_in_attention_landscape": {
+              "type": "object",
+              "properties": {
+                "severity_score": {"type": "integer", "minimum": 0, "maximum": 100},
+                "severity_level": {"type": "string", "enum": ["low", "medium", "high", "critical"]},
+                "assessment": {"type": "string"},
+                "api_data_insights": {"type": "object", "additionalProperties": true},
+                "recommendations": {"type": "array", "items": {"type": "string"}},
+                "context_breakdown": {"type": "object", "additionalProperties": true}
+              },
+              "required": ["severity_score", "severity_level", "assessment"]
+            },
+            "outgunned_by_ai_competitors": {
+              "type": "object",
+              "properties": {
+                "severity_score": {"type": "integer", "minimum": 0, "maximum": 100},
+                "severity_level": {"type": "string", "enum": ["low", "medium", "high", "critical"]},
+                "assessment": {"type": "string"},
+                "api_data_insights": {"type": "object", "additionalProperties": true},
+                "recommendations": {"type": "array", "items": {"type": "string"}},
+                "context_breakdown": {"type": "object", "additionalProperties": true}
+              },
+              "required": ["severity_score", "severity_level", "assessment"]
+            },
+            "tech_gap_underusing_ai": {
+              "type": "object",
+              "properties": {
+                "severity_score": {"type": "integer", "minimum": 0, "maximum": 100},
+                "severity_level": {"type": "string", "enum": ["low", "medium", "high", "critical"]},
+                "assessment": {"type": "string"},
+                "api_data_insights": {"type": "object", "additionalProperties": true},
+                "recommendations": {"type": "array", "items": {"type": "string"}},
+                "context_breakdown": {"type": "object", "additionalProperties": true}
+              },
+              "required": ["severity_score", "severity_level", "assessment"]
+            }
+          }
+        },
+        "context_analysis": {
+          "type": "object",
+          "description": "Analysis organized by the 5 business contexts",
+          "properties": {
+            "website_form_and_function": {
+              "type": "object",
+              "properties": {
+                "score": {"type": "integer", "minimum": 0, "maximum": 100},
+                "percentage": {"type": "number", "minimum": 0, "maximum": 100},
+                "assessment": {"type": "string"},
+                "api_data_insights": {"type": "object", "additionalProperties": true},
+                "strengths": {"type": "array", "items": {"type": "string"}},
+                "weaknesses": {"type": "array", "items": {"type": "string"}},
+                "priority_actions": {"type": "array", "items": {"type": "string"}},
+                "pain_point_connections": {"type": "object", "additionalProperties": true}
+              },
+              "required": ["score", "percentage", "assessment"]
+            },
+            "social_media_effectiveness": {
+              "type": "object",
+              "properties": {
+                "score": {"type": "integer", "minimum": 0, "maximum": 100},
+                "percentage": {"type": "number", "minimum": 0, "maximum": 100},
+                "assessment": {"type": "string"},
+                "api_data_insights": {"type": "object", "additionalProperties": true},
+                "strengths": {"type": "array", "items": {"type": "string"}},
+                "weaknesses": {"type": "array", "items": {"type": "string"}},
+                "priority_actions": {"type": "array", "items": {"type": "string"}},
+                "pain_point_connections": {"type": "object", "additionalProperties": true}
+              },
+              "required": ["score", "percentage", "assessment"]
+            },
+            "digital_presence": {
+              "type": "object",
+              "properties": {
+                "score": {"type": "integer", "minimum": 0, "maximum": 100},
+                "percentage": {"type": "number", "minimum": 0, "maximum": 100},
+                "assessment": {"type": "string"},
+                "api_data_insights": {"type": "object", "additionalProperties": true},
+                "strengths": {"type": "array", "items": {"type": "string"}},
+                "weaknesses": {"type": "array", "items": {"type": "string"}},
+                "priority_actions": {"type": "array", "items": {"type": "string"}},
+                "pain_point_connections": {"type": "object", "additionalProperties": true}
+              },
+              "required": ["score", "percentage", "assessment"]
+            },
+            "communication": {
+              "type": "object",
+              "properties": {
+                "score": {"type": "integer", "minimum": 0, "maximum": 100},
+                "percentage": {"type": "number", "minimum": 0, "maximum": 100},
+                "assessment": {"type": "string"},
+                "api_data_insights": {"type": "object", "additionalProperties": true},
+                "strengths": {"type": "array", "items": {"type": "string"}},
+                "weaknesses": {"type": "array", "items": {"type": "string"}},
+                "priority_actions": {"type": "array", "items": {"type": "string"}},
+                "pain_point_connections": {"type": "object", "additionalProperties": true}
+              },
+              "required": ["score", "percentage", "assessment"]
+            },
+            "marketing": {
+              "type": "object",
+              "properties": {
+                "score": {"type": "integer", "minimum": 0, "maximum": 100},
+                "percentage": {"type": "number", "minimum": 0, "maximum": 100},
+                "assessment": {"type": "string"},
+                "api_data_insights": {"type": "object", "additionalProperties": true},
+                "strengths": {"type": "array", "items": {"type": "string"}},
+                "weaknesses": {"type": "array", "items": {"type": "string"}},
+                "priority_actions": {"type": "array", "items": {"type": "string"}},
+                "pain_point_connections": {"type": "object", "additionalProperties": true}
+              },
+              "required": ["score", "percentage", "assessment"]
+            }
+          }
+        },
+        "comprehensive_api_insights": {
+          "type": "object",
+          "description": "Dynamic section for comprehensive insights from all API integrations",
+          "properties": {
+            "ghl_insights": {
+              "type": "object",
+              "description": "Insights from GoHighLevel integration",
+              "additionalProperties": true
+            },
+            "supabase_insights": {
+              "type": "object", 
+              "description": "Insights from Supabase integration",
+              "additionalProperties": true
+            },
+            "additional_api_data": {
+              "type": "object",
+              "description": "Data from any other API integrations",
+              "additionalProperties": true
+            },
+            "cross_platform_analysis": {
+              "type": "object",
+              "description": "Analysis combining data from multiple APIs",
+              "additionalProperties": true
+            }
+          }
+        },
+        "dynamic_sections": {
+          "type": "object",
+          "description": "Additional dynamic sections based on available data and insights",
+          "additionalProperties": {
+            "type": "object",
+            "properties": {
+              "title": {"type": "string"},
+              "content": {"type": "object", "additionalProperties": true},
+              "priority": {"type": "integer"},
+              "data_sources": {"type": "array", "items": {"type": "string"}}
+            }
+          }
+        },
+        "report_metadata": {
+          "type": "object",
+          "description": "Metadata about the report generation",
+          "properties": {
+            "generation_timestamp": {"type": "string"},
+            "api_integrations_used": {"type": "array", "items": {"type": "string"}},
+            "data_confidence_score": {"type": "number", "minimum": 0, "maximum": 1},
+            "report_version": {"type": "string"},
+            "agent_insights_count": {"type": "integer"}
+          }
+        }
+      },
+      "required": ["contact_info", "ai_iq_test_results", "verbal_summary", "pain_points_analysis", "context_analysis"]
+    }
+  },
+  "usage_instructions": {
+    "overview": "This tool enables truly dynamic report generation where the AI agent has complete freedom to structure insights based on available API data",
+    "key_features": [
+      "Flexible JSON structure with additionalProperties: true for dynamic content",
+      "Organized around 4 Pain Points and 5 Contexts framework",
+      "Separate verbal summary for agent presentation",
+      "Cross-referencing between pain points and contexts",
+      "Dynamic API insights integration",
+      "Comprehensive metadata tracking"
+    ],
+    "agent_instructions": [
+      "Use all available API integrations to gather comprehensive data",
+      "Organize findings around the 4 Pain Points and 5 Contexts",
+      "Populate api_data_insights with actual data from your integrations",
+      "Create cross-references between pain points and contexts",
+      "Generate dynamic sections for unique insights not covered elsewhere",
+      "Ensure verbal_summary contains content you'll actually speak to the user"
+    ]
+  },
+  "integration_endpoints": {
+    "webhook_url": "https://your-backend.com/api/webhooks/vapi-comprehensive-result",
+    "ghl_sync_url": "https://hooks.gohighlevel.com/webhook/your-webhook-id"
+  }
+}
