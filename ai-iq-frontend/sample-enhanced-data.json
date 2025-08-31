@@ -1,0 +1,57 @@
+{
+  "id": "test-123",
+  "user_email": "test@example.com",
+  "user_name": "Test User",
+  "contact_id": "ghl_contact_123",
+  "overall_score": 75,
+  "session_metadata": {
+    "vapi_call_id": "vapi_call_456",
+    "call_duration": 1200,
+    "agent_confidence_score": 85,
+    "return_user": true,
+    "previous_test_count": 2,
+    "user_website_url": "https://example.com"
+  },
+  "voice_summary": {
+    "verbal_summary": "The client shows strong potential in digital presence but needs improvement in AI automation.",
+    "conversation_highlights": [
+      "Expressed interest in AI automation tools",
+      "Currently struggling with manual processes",
+      "Has budget allocated for technology improvements"
+    ],
+    "client_concerns_expressed": [
+      "Worried about implementation complexity",
+      "Concerned about staff training requirements"
+    ]
+  },
+  "api_data_sources": {
+    "tools_used": ["BuiltWith", "SerpAPI", "Social Media Analytics"],
+    "data_quality_score": 78,
+    "analysis_depth": "comprehensive"
+  },
+  "subscription_recommendations": {
+    "ai_iq_subscription_recommendation": "Recommended for comprehensive AI implementation support",
+    "vip_support_recommendation": "VIP support recommended for faster implementation",
+    "priority_level": "high",
+    "estimated_roi_timeline": "3-6 months"
+  },
+  "pain_points": {
+    "cant_scale_without_burnout": {
+      "score": 7,
+      "description": "Manual processes limiting growth",
+      "severity": "high"
+    }
+  },
+  "categories": {
+    "website_form_function": {
+      "score": 8,
+      "max_score": 10,
+      "percentage": 80,
+      "strengths": ["Good design", "Fast loading"],
+      "weaknesses": ["Missing AI features"],
+      "priority_actions": ["Add chatbot", "Implement automation"]
+    }
+  },
+  "recommendations": ["Implement AI automation", "Upgrade website features"],
+  "created_at": "2025-08-31T03:00:00Z"
+}

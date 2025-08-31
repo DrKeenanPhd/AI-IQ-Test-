@@ -75,6 +75,7 @@ class TestResultResponse(BaseModel):
     id: str
     user_email: str
     user_name: str
+    contact_id: Optional[str] = None
     pain_points: Dict[str, Dict[str, Any]]
     categories: Dict[str, Dict[str, Any]]
     overall_score: int
@@ -82,6 +83,11 @@ class TestResultResponse(BaseModel):
     custom_sections: Optional[Dict[str, Dict[str, Any]]] = None
     report_metadata: Optional[Dict[str, Any]] = None
     created_at: datetime
+    
+    session_metadata: Optional[Dict[str, Any]] = None
+    voice_summary: Optional[Dict[str, Any]] = None
+    api_data_sources: Optional[Dict[str, Any]] = None
+    subscription_recommendations: Optional[Dict[str, Any]] = None
 
 class CreateTestResultRequest(BaseModel):
     user_id: str

@@ -5,7 +5,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Progress } from '@/components/ui/progress'
 import { Badge } from '@/components/ui/badge'
 import { Alert, AlertDescription } from '@/components/ui/alert'
-import { Brain, TrendingUp, Users, Globe, MessageSquare, Target, CheckCircle, AlertTriangle, XCircle } from 'lucide-react'
+import { Brain, TrendingUp, Users, Globe, MessageSquare, Target, CheckCircle, AlertTriangle, XCircle, Clock, Mic } from 'lucide-react'
 import './App.css'
 
 interface UserAuth {
@@ -18,6 +18,7 @@ interface TestResult {
   id: string
   user_email: string
   user_name: string
+  contact_id?: string
   pain_points: Record<string, any>
   categories: Record<string, any>
   overall_score: number
@@ -25,6 +26,37 @@ interface TestResult {
   custom_sections?: Record<string, any>
   report_metadata?: Record<string, any>
   created_at: string
+  
+  session_metadata?: {
+    vapi_call_id: string
+    call_duration?: number
+    agent_confidence_score?: number
+    return_user?: boolean
+    previous_test_count?: number
+    user_website_url?: string
+  }
+  
+  voice_summary?: {
+    verbal_summary?: string
+    conversation_highlights?: string[]
+    call_transcript_summary?: string
+    agent_recommendations_spoken?: string[]
+    client_concerns_expressed?: string[]
+  }
+  
+  api_data_sources?: {
+    tools_used?: string[]
+    data_quality_score?: number
+    analysis_depth?: string
+    missing_data_notes?: string[]
+  }
+  
+  subscription_recommendations?: {
+    ai_iq_subscription_recommendation?: string
+    vip_support_recommendation?: string
+    priority_level?: string
+    estimated_roi_timeline?: string
+  }
 }
 
 function App() {
@@ -118,6 +150,205 @@ function App() {
     }
     return names[key] || formatCategoryName(key)
   }
+
+  const SessionMetadataCard: React.FC<{ sessionData: TestResult['session_metadata'] }> = ({ sessionData }) => {
+    if (!sessionData) return null;
+    
+    return (
+      <Card className="bg-gray-800/50 border-gray-700 backdrop-blur-sm">
+        <CardHeader>
+          <CardTitle className="text-white flex items-center space-x-2">
+            <Clock className="w-5 h-5 text-teal-400" />
+            <span>Session Details</span>
+          </CardTitle>
+        </CardHeader>
+        <CardContent className="space-y-3">
+          {sessionData.call_duration && (
+            <div className="flex justify-between items-center">
+              <span className="text-gray-300">Call Duration</span>
+              <Badge variant="secondary">{Math.round(sessionData.call_duration / 60)} min</Badge>
+            </div>
+          )}
+          {sessionData.agent_confidence_score && (
+            <div className="space-y-2">
+              <div className="flex justify-between items-center">
+                <span className="text-gray-300">Analysis Confidence</span>
+                <span className="text-white font-semibold">{sessionData.agent_confidence_score}%</span>
+              </div>
+              <Progress value={sessionData.agent_confidence_score} className="h-2" />
+            </div>
+          )}
+          {sessionData.return_user && (
+            <div className="flex justify-between items-center">
+              <span className="text-gray-300">Return User</span>
+              <Badge variant="outline" className="text-teal-400 border-teal-400">
+                {sessionData.previous_test_count || 0} previous tests
+              </Badge>
+            </div>
+          )}
+          {sessionData.user_website_url && (
+            <div className="space-y-1">
+              <span className="text-gray-300 text-sm">Website Analyzed</span>
+              <p className="text-teal-400 text-sm break-all">{sessionData.user_website_url}</p>
+            </div>
+          )}
+        </CardContent>
+      </Card>
+    );
+  };
+
+  const VoiceSummaryCard: React.FC<{ voiceData: TestResult['voice_summary'] }> = ({ voiceData }) => {
+    if (!voiceData) return null;
+    
+    return (
+      <Card className="bg-gray-800/50 border-gray-700 backdrop-blur-sm">
+        <CardHeader>
+          <CardTitle className="text-white flex items-center space-x-2">
+            <Mic className="w-5 h-5 text-purple-400" />
+            <span>Conversation Summary</span>
+          </CardTitle>
+        </CardHeader>
+        <CardContent className="space-y-4">
+          {voiceData.verbal_summary && (
+            <div>
+              <h5 className="text-sm font-semibold text-purple-400 mb-2">Key Takeaways</h5>
+              <p className="text-gray-300 text-sm">{voiceData.verbal_summary}</p>
+            </div>
+          )}
+          
+          {voiceData.conversation_highlights && voiceData.conversation_highlights.length > 0 && (
+            <div>
+              <h5 className="text-sm font-semibold text-purple-400 mb-2">Conversation Highlights</h5>
+              <ul className="space-y-1">
+                {voiceData.conversation_highlights.map((highlight, idx) => (
+                  <li key={idx} className="flex items-start space-x-2">
+                    <CheckCircle className="w-3 h-3 text-purple-400 mt-1 flex-shrink-0" />
+                    <span className="text-gray-300 text-sm">{highlight}</span>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          )}
+          
+          {voiceData.client_concerns_expressed && voiceData.client_concerns_expressed.length > 0 && (
+            <div>
+              <h5 className="text-sm font-semibold text-red-400 mb-2">Client Concerns</h5>
+              <ul className="space-y-1">
+                {voiceData.client_concerns_expressed.map((concern, idx) => (
+                  <li key={idx} className="flex items-start space-x-2">
+                    <AlertTriangle className="w-3 h-3 text-red-400 mt-1 flex-shrink-0" />
+                    <span className="text-gray-300 text-sm">{concern}</span>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          )}
+        </CardContent>
+      </Card>
+    );
+  };
+
+  const DataSourcesCard: React.FC<{ apiData: TestResult['api_data_sources'] }> = ({ apiData }) => {
+    if (!apiData) return null;
+    
+    return (
+      <Card className="bg-gray-800/50 border-gray-700 backdrop-blur-sm">
+        <CardHeader>
+          <CardTitle className="text-white flex items-center space-x-2">
+            <Brain className="w-5 h-5 text-teal-400" />
+            <span>Analysis Sources</span>
+          </CardTitle>
+        </CardHeader>
+        <CardContent className="space-y-3">
+          {apiData.tools_used && apiData.tools_used.length > 0 && (
+            <div>
+              <h5 className="text-sm font-semibold text-teal-400 mb-2">Tools Used</h5>
+              <div className="flex flex-wrap gap-2">
+                {apiData.tools_used.map((tool, idx) => (
+                  <Badge key={idx} variant="outline" className="text-teal-400 border-teal-400">
+                    {tool}
+                  </Badge>
+                ))}
+              </div>
+            </div>
+          )}
+          
+          {apiData.data_quality_score && (
+            <div className="space-y-2">
+              <div className="flex justify-between items-center">
+                <span className="text-gray-300">Data Quality</span>
+                <span className="text-white font-semibold">{apiData.data_quality_score}%</span>
+              </div>
+              <Progress value={apiData.data_quality_score} className="h-2" />
+            </div>
+          )}
+          
+          {apiData.analysis_depth && (
+            <div className="flex justify-between items-center">
+              <span className="text-gray-300">Analysis Depth</span>
+              <Badge variant="secondary" className="capitalize">{apiData.analysis_depth}</Badge>
+            </div>
+          )}
+        </CardContent>
+      </Card>
+    );
+  };
+
+  const SubscriptionRecommendationsCard: React.FC<{ subData: TestResult['subscription_recommendations'] }> = ({ subData }) => {
+    if (!subData) return null;
+    
+    const getPriorityColor = (priority: string) => {
+      switch (priority) {
+        case 'urgent': return 'text-red-400 border-red-400';
+        case 'high': return 'text-orange-400 border-orange-400';
+        case 'medium': return 'text-yellow-400 border-yellow-400';
+        case 'low': return 'text-green-400 border-green-400';
+        default: return 'text-gray-400 border-gray-400';
+      }
+    };
+    
+    return (
+      <Card className="bg-gray-800/50 border-gray-700 backdrop-blur-sm">
+        <CardHeader>
+          <CardTitle className="text-white flex items-center space-x-2">
+            <Target className="w-5 h-5 text-purple-400" />
+            <span>Recommended Solutions</span>
+          </CardTitle>
+        </CardHeader>
+        <CardContent className="space-y-4">
+          {subData.priority_level && (
+            <div className="flex justify-between items-center">
+              <span className="text-gray-300">Priority Level</span>
+              <Badge variant="outline" className={`capitalize ${getPriorityColor(subData.priority_level)}`}>
+                {subData.priority_level}
+              </Badge>
+            </div>
+          )}
+          
+          {subData.ai_iq_subscription_recommendation && (
+            <div>
+              <h5 className="text-sm font-semibold text-purple-400 mb-2">AI IQ Business Analysis</h5>
+              <p className="text-gray-300 text-sm">{subData.ai_iq_subscription_recommendation}</p>
+            </div>
+          )}
+          
+          {subData.vip_support_recommendation && (
+            <div>
+              <h5 className="text-sm font-semibold text-purple-400 mb-2">VIP Support Recommendation</h5>
+              <p className="text-gray-300 text-sm">{subData.vip_support_recommendation}</p>
+            </div>
+          )}
+          
+          {subData.estimated_roi_timeline && (
+            <div>
+              <h5 className="text-sm font-semibold text-green-400 mb-2">Expected ROI Timeline</h5>
+              <p className="text-gray-300 text-sm">{subData.estimated_roi_timeline}</p>
+            </div>
+          )}
+        </CardContent>
+      </Card>
+    );
+  };
 
   if (!isAuthenticated) {
     return (
@@ -230,101 +461,111 @@ function App() {
             </p>
           </div>
 
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-12">
-            <Card className="bg-gray-800/50 border-gray-700 backdrop-blur-sm">
-              <CardHeader>
-                <CardTitle className="text-white flex items-center space-x-2">
-                  <AlertTriangle className="w-6 h-6 text-yellow-400" />
-                  <span>Critical Pain Points</span>
-                </CardTitle>
-              </CardHeader>
-              <CardContent className="space-y-4">
-                {Object.entries(testResult.pain_points).map(([key, point]: [string, any]) => (
-                  <div key={key} className="flex items-start space-x-3 p-4 bg-gray-700/30 rounded-lg">
-                    {getSeverityIcon(point.severity)}
-                    <div className="flex-1">
-                      <h4 className="font-semibold text-white mb-1">{formatPainPointName(key)}</h4>
-                      <p className="text-gray-300 text-sm mb-2">{point.description}</p>
-                      <Badge variant={point.severity === 'high' ? 'destructive' : 'secondary'}>
-                        Score: {point.score}/10
-                      </Badge>
-                    </div>
-                  </div>
-                ))}
-              </CardContent>
-            </Card>
-
-            <Card className="bg-gray-800/50 border-gray-700 backdrop-blur-sm">
-              <CardHeader>
-                <CardTitle className="text-white">AI Widget Integration</CardTitle>
-                <CardDescription className="text-gray-300">
-                  Your AI assistant will be embedded here
-                </CardDescription>
-              </CardHeader>
-              <CardContent>
-                <div className="bg-gray-700/30 border-2 border-dashed border-gray-600 rounded-lg p-8 text-center">
-                  <Brain className="w-12 h-12 text-teal-400 mx-auto mb-4" />
-                  <p className="text-gray-300 mb-4">AI Widget Placeholder</p>
-                  <p className="text-sm text-gray-400">
-                    Insert your VAPI HTML code here to activate your AI assistant
-                  </p>
-                </div>
-              </CardContent>
-            </Card>
-          </div>
-
-          <div className={`grid gap-6 mb-12 ${
-            Object.keys(testResult.categories).length <= 3 
-              ? 'grid-cols-1 md:grid-cols-2 lg:grid-cols-3' 
-              : Object.keys(testResult.categories).length <= 5
-              ? 'grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5'
-              : 'grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4'
-          }`}>
-            {Object.entries(testResult.categories).map(([key, category]: [string, any]) => (
-              <Card key={key} className="bg-gray-800/50 border-gray-700 backdrop-blur-sm">
-                <CardHeader className="pb-3">
-                  <div className="flex items-center space-x-2 mb-2">
-                    {getCategoryIcon(key)}
-                    <CardTitle className="text-lg text-white">{formatCategoryName(key)}</CardTitle>
-                  </div>
-                  <div className="space-y-2">
-                    <div className="flex justify-between items-center">
-                      <span className="text-2xl font-bold text-white">{category.score}</span>
-                      <span className="text-sm text-gray-400">/ {category.max_score}</span>
-                    </div>
-                    <Progress value={category.percentage} className="h-2" />
-                    <p className="text-sm text-gray-300">{category.percentage}% Complete</p>
-                  </div>
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 mb-12">
+            <div className="lg:col-span-2 space-y-8">
+              <Card className="bg-gray-800/50 border-gray-700 backdrop-blur-sm">
+                <CardHeader>
+                  <CardTitle className="text-white flex items-center space-x-2">
+                    <AlertTriangle className="w-6 h-6 text-yellow-400" />
+                    <span>Critical Pain Points</span>
+                  </CardTitle>
                 </CardHeader>
-                <CardContent className="pt-0">
-                  <div className="space-y-3">
-                    <div>
-                      <h5 className="text-sm font-semibold text-green-400 mb-1">Strengths</h5>
-                      <ul className="text-xs text-gray-300 space-y-1">
-                        {category.strengths?.map((strength: string, idx: number) => (
-                          <li key={idx} className="flex items-start space-x-1">
-                            <CheckCircle className="w-3 h-3 text-green-400 mt-0.5 flex-shrink-0" />
-                            <span>{strength}</span>
-                          </li>
-                        ))}
-                      </ul>
+                <CardContent className="space-y-4">
+                  {Object.entries(testResult.pain_points).map(([key, point]: [string, any]) => (
+                    <div key={key} className="flex items-start space-x-3 p-4 bg-gray-700/30 rounded-lg">
+                      {getSeverityIcon(point.severity)}
+                      <div className="flex-1">
+                        <h4 className="font-semibold text-white mb-1">{formatPainPointName(key)}</h4>
+                        <p className="text-gray-300 text-sm mb-2">{point.description}</p>
+                        <Badge variant={point.severity === 'high' ? 'destructive' : 'secondary'}>
+                          Score: {point.score}/10
+                        </Badge>
+                      </div>
                     </div>
-                    <div>
-                      <h5 className="text-sm font-semibold text-red-400 mb-1">Areas for Improvement</h5>
-                      <ul className="text-xs text-gray-300 space-y-1">
-                        {category.weaknesses?.map((weakness: string, idx: number) => (
-                          <li key={idx} className="flex items-start space-x-1">
-                            <XCircle className="w-3 h-3 text-red-400 mt-0.5 flex-shrink-0" />
-                            <span>{weakness}</span>
-                          </li>
-                        ))}
-                      </ul>
-                    </div>
+                  ))}
+                </CardContent>
+              </Card>
+
+              <div className={`grid gap-6 ${
+                Object.keys(testResult.categories).length <= 3 
+                  ? 'grid-cols-1 md:grid-cols-2 lg:grid-cols-3' 
+                  : Object.keys(testResult.categories).length <= 5
+                  ? 'grid-cols-1 md:grid-cols-2 lg:grid-cols-3'
+                  : 'grid-cols-1 md:grid-cols-2 lg:grid-cols-3'
+              }`}>
+                {Object.entries(testResult.categories).map(([key, category]: [string, any]) => (
+                  <Card key={key} className="bg-gray-800/50 border-gray-700 backdrop-blur-sm">
+                    <CardHeader className="pb-3">
+                      <div className="flex items-center space-x-2 mb-2">
+                        {getCategoryIcon(key)}
+                        <CardTitle className="text-lg text-white">{formatCategoryName(key)}</CardTitle>
+                      </div>
+                      <div className="space-y-2">
+                        <div className="flex justify-between items-center">
+                          <span className="text-2xl font-bold text-white">{category.score}</span>
+                          <span className="text-sm text-gray-400">/ {category.max_score}</span>
+                        </div>
+                        <Progress value={category.percentage} className="h-2" />
+                        <p className="text-sm text-gray-300">{category.percentage}% Complete</p>
+                      </div>
+                    </CardHeader>
+                    <CardContent className="pt-0">
+                      <div className="space-y-3">
+                        <div>
+                          <h5 className="text-sm font-semibold text-green-400 mb-1">Strengths</h5>
+                          <ul className="text-xs text-gray-300 space-y-1">
+                            {category.strengths?.map((strength: string, idx: number) => (
+                              <li key={idx} className="flex items-start space-x-1">
+                                <CheckCircle className="w-3 h-3 text-green-400 mt-0.5 flex-shrink-0" />
+                                <span>{strength}</span>
+                              </li>
+                            ))}
+                          </ul>
+                        </div>
+                        <div>
+                          <h5 className="text-sm font-semibold text-red-400 mb-1">Areas for Improvement</h5>
+                          <ul className="text-xs text-gray-300 space-y-1">
+                            {category.weaknesses?.map((weakness: string, idx: number) => (
+                              <li key={idx} className="flex items-start space-x-1">
+                                <XCircle className="w-3 h-3 text-red-400 mt-0.5 flex-shrink-0" />
+                                <span>{weakness}</span>
+                              </li>
+                            ))}
+                          </ul>
+                        </div>
+                      </div>
+                    </CardContent>
+                  </Card>
+                ))}
+              </div>
+            </div>
+
+            <div className="space-y-6">
+              <Card className="bg-gray-800/50 border-gray-700 backdrop-blur-sm">
+                <CardHeader>
+                  <CardTitle className="text-white">AI Assistant</CardTitle>
+                  <CardDescription className="text-gray-300">
+                    Chat with Freedom for follow-up questions
+                  </CardDescription>
+                </CardHeader>
+                <CardContent>
+                  <div className="bg-gray-700/30 border-2 border-dashed border-gray-600 rounded-lg p-6 text-center">
+                    <Brain className="w-10 h-10 text-teal-400 mx-auto mb-3" />
+                    <p className="text-gray-300 text-sm mb-3">VAPI Widget Here</p>
+                    <p className="text-xs text-gray-400">
+                      Insert your VAPI HTML code here to activate your AI assistant
+                    </p>
                   </div>
                 </CardContent>
               </Card>
-            ))}
+
+              <SessionMetadataCard sessionData={testResult.session_metadata} />
+              <VoiceSummaryCard voiceData={testResult.voice_summary} />
+              <DataSourcesCard apiData={testResult.api_data_sources} />
+              <SubscriptionRecommendationsCard subData={testResult.subscription_recommendations} />
+            </div>
           </div>
+
 
           <Card className="bg-gray-800/50 border-gray-700 backdrop-blur-sm">
             <CardHeader>
