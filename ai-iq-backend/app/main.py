@@ -16,6 +16,9 @@ import uuid
 import json
 import os
 from fastapi import Request
+from dotenv import load_dotenv
+
+load_dotenv()
 
 app = FastAPI(title="AI IQ Test Results API", version="1.0.0")
 
