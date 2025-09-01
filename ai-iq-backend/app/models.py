@@ -146,7 +146,7 @@ class UserSubscription(BaseModel):
     stripe_subscription_id: Optional[str] = None
     current_period_start: Optional[datetime] = None
     current_period_end: Optional[datetime] = None
-    created_at: datetime
+    created_at: datetime = datetime.now()
 
 class CreateSubscriptionRequest(BaseModel):
     user_id: str

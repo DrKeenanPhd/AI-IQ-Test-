@@ -105,7 +105,7 @@ class AIIQTestEngine:
         return {
             "website_form_function": {
                 "title": "Website Form and Function",
-                "max_score": 40,
+                "max_score": 20,
                 "strengths_pool": [
                     "Good mobile responsiveness",
                     "Fast loading times",
@@ -130,7 +130,7 @@ class AIIQTestEngine:
             },
             "social_media_effectiveness": {
                 "title": "Social Media Effectiveness",
-                "max_score": 40,
+                "max_score": 20,
                 "strengths_pool": [
                     "Consistent posting",
                     "Good engagement rates",
@@ -155,7 +155,7 @@ class AIIQTestEngine:
             },
             "digital_presence": {
                 "title": "Digital Presence",
-                "max_score": 40,
+                "max_score": 20,
                 "strengths_pool": [
                     "Strong brand recognition",
                     "Good online reviews",
@@ -180,7 +180,7 @@ class AIIQTestEngine:
             },
             "communication": {
                 "title": "Communication",
-                "max_score": 40,
+                "max_score": 20,
                 "strengths_pool": [
                     "Clear messaging",
                     "Good customer service",
@@ -205,7 +205,7 @@ class AIIQTestEngine:
             },
             "marketing": {
                 "title": "Marketing",
-                "max_score": 40,
+                "max_score": 20,
                 "strengths_pool": [
                     "Good targeting",
                     "Strong campaigns",
@@ -299,16 +299,14 @@ class AIIQTestEngine:
         """Generate categories with dynamic scoring"""
         categories = {}
         
-        for key, definition in self.category_definitions.items():
-            max_score = definition["max_score"]
+        score_pool = [12, 14, 16, 18, 15, 13, 17, 19, 11, 16]
+        random.shuffle(score_pool)
+        
+        for i, (key, definition) in enumerate(self.category_definitions.items()):
+            max_score = 20
             
-            weight = self.config.category_weights.get(key, 1.0)
-            if test_parameters:
-                weight *= self._calculate_parameter_influence(test_parameters, [key])
-            
-            base_score = random.uniform(20, 35)
-            score = int(base_score * weight)
-            score = max(10, min(max_score, score))
+            score = score_pool[i % len(score_pool)]
+            score = min(score, max_score)  # Ensure cap at 20
             
             percentage = int((score / max_score) * 100)
             
@@ -431,10 +429,11 @@ class AIIQTestEngine:
     ) -> int:
         """Calculate overall AI IQ score (0-100 scale)"""
         category_total = sum(cat.score for cat in categories.values())
-        pain_point_penalty = sum(pp.score for pp in pain_points.values()) * 2
         
-        base_score = category_total - pain_point_penalty
-        return max(25, min(100, base_score))
+        pain_point_penalty = sum(pp.score for pp in pain_points.values()) * 0.5
+        
+        final_score = category_total - pain_point_penalty
+        return max(0, min(100, int(final_score)))
     
     def _generate_recommendations(
         self, 

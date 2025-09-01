@@ -105,16 +105,16 @@ function App() {
   }> = ({ tabId, number, title, color }) => (
     <button
       onClick={() => setActiveTab(tabId)}
-      className={`flex items-center space-x-3 px-6 py-4 rounded-lg transition-all ${
+      className={`flex items-center space-x-3 px-6 py-4 transition-all relative border-b-4 ${
         activeTab === tabId 
-          ? `bg-${color}-500/20 border-${color}-500 text-${color}-400` 
-          : 'bg-black/50 border-gray-800 text-gray-400 hover:border-gray-700'
-      } border-2`}
+          ? `text-${color}-400 border-${color}-400 bg-${color}-500/10` 
+          : `text-${color}-400 border-${color}-400/20 hover:border-${color}-400/50 hover:bg-${color}-500/5`
+      }`}
     >
-      <span className={`text-2xl font-bold ${activeTab === tabId ? `text-${color}-400` : 'text-gray-500'}`}>
+      <span className={`text-2xl font-bold text-${color}-400`}>
         {number}
       </span>
-      <span className="font-semibold">{title}</span>
+      <span className={`font-semibold text-${color}-400`}>{title}</span>
     </button>
   )
   
@@ -186,12 +186,96 @@ function App() {
 
   const TestResultsTab: React.FC<{ testResult: TestResult }> = ({ testResult }) => (
     <div className="space-y-8">
+      {/* Comprehensive Business Assessment - 5 Categories × 20 points each */}
+      <Card className="bg-black/80 border-gray-800 backdrop-blur-sm">
+        <CardHeader>
+          <CardTitle className="text-white flex items-center space-x-2">
+            <Target className="w-6 h-6 text-teal-400" />
+            <span>Comprehensive Business Assessment</span>
+          </CardTitle>
+          <CardDescription className="text-gray-300">
+            AI readiness evaluation across 5 key business areas (20 points each)
+          </CardDescription>
+        </CardHeader>
+        <CardContent>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {Object.entries(testResult.categories).map(([key, category]: [string, any]) => (
+              <Card key={key} className="bg-black/50 border-gray-700">
+                <CardHeader>
+                  <CardTitle className="text-white text-lg">{formatCategoryName(key)}</CardTitle>
+                  <CardDescription className="text-gray-300">
+                    Score: {Math.min(category.score, 20)}/20
+                  </CardDescription>
+                </CardHeader>
+                <CardContent>
+                  <div className="space-y-4">
+                    {/* Current Score Progress Bar */}
+                    <div className="space-y-2">
+                      <div className="flex justify-between text-xs text-gray-400">
+                        <span>Current Performance</span>
+                        <span>{Math.min(category.score, 20)}/20</span>
+                      </div>
+                      <div className="w-full bg-gray-800 rounded-full h-3">
+                        <div 
+                          className={`h-3 rounded-full transition-all duration-300 ${
+                            Math.min(category.score, 20) <= 10 ? 'bg-red-500' : 
+                            Math.min(category.score, 20) <= 16 ? 'bg-yellow-500' : 
+                            'bg-green-500'
+                          }`}
+                          style={{ width: `${(Math.min(category.score, 20) / 20) * 100}%` }}
+                        />
+                      </div>
+                    </div>
+                    
+                    {/* Improvement Opportunity Progress Bar */}
+                    <div className="space-y-2">
+                      <div className="flex justify-between text-xs text-gray-400">
+                        <span>Improvement Potential</span>
+                        <span>{Math.max(0, 20 - Math.min(category.score, 20))}/20</span>
+                      </div>
+                      <div className="w-full bg-gray-800 rounded-full h-3">
+                        <div 
+                          className={`h-3 rounded-full transition-all duration-300 ${
+                            Math.max(0, 20 - Math.min(category.score, 20)) <= 10 ? 'bg-red-400/60' : 
+                            Math.max(0, 20 - Math.min(category.score, 20)) <= 16 ? 'bg-yellow-400/60' : 
+                            'bg-green-400/60'
+                          }`}
+                          style={{ width: `${(Math.max(0, 20 - Math.min(category.score, 20)) / 20) * 100}%` }}
+                        />
+                      </div>
+                    </div>
+                    <p className="text-gray-300 text-sm">{category.description}</p>
+                    {category.recommendations && category.recommendations.length > 0 && (
+                      <div className="mt-3">
+                        <h5 className="text-white font-medium mb-2">Recommendations:</h5>
+                        <ul className="text-gray-300 text-sm space-y-1">
+                          {category.recommendations.map((rec: string, idx: number) => (
+                            <li key={idx} className="flex items-start space-x-2">
+                              <span className="text-teal-400 mt-1">•</span>
+                              <span>{rec}</span>
+                            </li>
+                          ))}
+                        </ul>
+                      </div>
+                    )}
+                  </div>
+                </CardContent>
+              </Card>
+            ))}
+          </div>
+        </CardContent>
+      </Card>
+      
+      {/* Critical Pain Points - Now positioned after comprehensive assessment */}
       <Card className="bg-black/80 border-gray-800 backdrop-blur-sm">
         <CardHeader>
           <CardTitle className="text-white flex items-center space-x-2">
             <AlertTriangle className="w-6 h-6 text-yellow-400" />
             <span>Critical Pain Points</span>
           </CardTitle>
+          <CardDescription className="text-gray-300">
+            Areas requiring immediate attention based on comprehensive assessment
+          </CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
           {Object.entries(testResult.pain_points).map(([key, point]: [string, any]) => (
@@ -208,43 +292,6 @@ function App() {
           ))}
         </CardContent>
       </Card>
-      
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-        {Object.entries(testResult.categories).map(([key, category]: [string, any]) => (
-          <Card key={key} className="bg-black/80 border-gray-800 backdrop-blur-sm">
-            <CardHeader>
-              <CardTitle className="text-white text-lg">{formatCategoryName(key)}</CardTitle>
-              <CardDescription className="text-gray-300">
-                Score: {category.score}/{category.max_score}
-              </CardDescription>
-            </CardHeader>
-            <CardContent>
-              <div className="space-y-3">
-                <div className="w-full bg-gray-800 rounded-full h-2">
-                  <div 
-                    className="bg-teal-500 h-2 rounded-full transition-all duration-300" 
-                    style={{ width: `${category.score}%` }}
-                  />
-                </div>
-                <p className="text-gray-300 text-sm">{category.description}</p>
-                {category.recommendations && category.recommendations.length > 0 && (
-                  <div className="mt-3">
-                    <h5 className="text-white font-medium mb-2">Recommendations:</h5>
-                    <ul className="text-gray-300 text-sm space-y-1">
-                      {category.recommendations.map((rec: string, idx: number) => (
-                        <li key={idx} className="flex items-start space-x-2">
-                          <span className="text-teal-400 mt-1">•</span>
-                          <span>{rec}</span>
-                        </li>
-                      ))}
-                    </ul>
-                  </div>
-                )}
-              </div>
-            </CardContent>
-          </Card>
-        ))}
-      </div>
     </div>
   )
 
@@ -694,29 +741,73 @@ function App() {
     <div className="min-h-screen bg-black">
       <div className="relative z-10">
         <header className="border-b border-gray-800/50 bg-black/30 backdrop-blur-sm">
-          <div className="max-w-7xl mx-auto px-4 py-6">
+          <div className="max-w-7xl mx-auto px-4 py-2">
             <div className="flex items-center justify-between">
-              <div className="flex items-center space-x-6">
-                <img src="/logo.png" alt="AiAlive" className="w-12 h-12" />
-                <div className="flex flex-col">
-                  <div className="inline-flex items-center justify-center w-16 h-16 bg-gradient-to-r from-teal-500 to-purple-600 rounded-full">
-                    <span className="text-2xl font-bold text-white">{testResult.overall_score}</span>
-                  </div>
-                  <span className="text-sm font-semibold text-white mt-1">Your AI IQ Score</span>
+              <div className="flex items-center space-x-4">
+                <div className="flex flex-col items-center space-y-1">
+                  <img src="/logo.png" alt="AiAlive" className="w-12 h-12" />
+                  <img src="/favicon.png" alt="AI IQ" className="w-6 h-6" />
                 </div>
-              </div>
-              <div className="text-center flex-1">
-                <h1 className="text-2xl font-bold text-white">Test Results</h1>
+                <h1 className="text-xl font-bold text-white">AI IQ Test Results</h1>
               </div>
               <div className="text-right">
-                <p className="text-white font-semibold">{testResult.user_name}</p>
-                <p className="text-gray-400 text-sm">{testResult.user_email}</p>
+                <p className="text-white font-semibold text-sm">{testResult.user_name}</p>
+                <p className="text-gray-400 text-xs">{testResult.user_email}</p>
               </div>
             </div>
           </div>
         </header>
 
-        <main className="max-w-7xl mx-auto px-4 py-8 space-y-8">
+        <main className="max-w-7xl mx-auto px-4 py-8 space-y-8 relative">
+          {/* AI Agent Widget - Floating 5% from right edge */}
+          <div className="fixed top-4 z-50" style={{ right: '5%' }}>
+            <Card className="bg-black/80 border-gray-800 backdrop-blur-sm" style={{ width: '24rem', height: '32rem' }}>
+              <CardHeader>
+                <CardTitle className="text-white flex items-center space-x-2">
+                  <img src="/favicon.png" alt="AiAlive" className="w-5 h-5" />
+                  <span>AI Assistant - Freedom</span>
+                </CardTitle>
+                <CardDescription className="text-gray-300">
+                  Chat for follow-up questions and guidance
+                </CardDescription>
+              </CardHeader>
+              <CardContent className="h-full flex flex-col">
+                <div className="flex-1 bg-black/50 border-2 border-dashed border-gray-800 rounded-lg p-4 flex flex-col items-center justify-center">
+                  <img src="/favicon.png" alt="AiAlive" className="w-12 h-12 mb-4" />
+                  <p className="text-gray-300 text-sm mb-3 text-center">VAPI Widget Integration</p>
+                  <p className="text-xs text-gray-400 text-center">
+                    30-minute session included with your test results
+                  </p>
+                  <div className="mt-4 text-center">
+                    <p className="text-xs text-teal-400">After 30 minutes:</p>
+                    <p className="text-xs text-gray-400">Upgrade for continued access</p>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+            
+            {/* CTA Buttons positioned just under the widget */}
+            <div className="mt-4 space-y-2">
+              <button className="w-full bg-teal-600 hover:bg-teal-700 text-white text-sm py-3 px-4 rounded transition-colors">
+                AI Transformation Sessions - $100/mo
+              </button>
+              <button className="w-full bg-purple-600 hover:bg-purple-700 text-white text-sm py-3 px-4 rounded transition-colors">
+                Devin-like Superpowers
+              </button>
+              <button className="w-full bg-blue-600 hover:bg-blue-700 text-white text-sm py-3 px-4 rounded transition-colors">
+                Human Support Option
+              </button>
+            </div>
+          </div>
+
+          {/* AI IQ Score positioned beneath header */}
+          <div className="flex items-center space-x-4 mb-8">
+            <div className="inline-flex items-center justify-center w-16 h-16 bg-gradient-to-r from-teal-500 to-purple-600 rounded-full">
+              <span className="text-2xl font-bold text-white">{testResult.overall_score}</span>
+            </div>
+            <span className="text-lg font-semibold text-white">Your AI IQ Score</span>
+          </div>
+
           <div className="text-center mb-8">
             <ul className="text-gray-300 space-y-2 max-w-2xl mx-auto">
               <li>• Comprehensive AI readiness assessment completed</li>
@@ -726,64 +817,23 @@ function App() {
             </ul>
           </div>
 
-          <div className="flex flex-col lg:flex-row gap-4 mb-8">
+          <div className="flex flex-col lg:flex-row gap-4 mb-8 border-b border-gray-800">
             <TabButton tabId="test-results" number="01" title="AI IQ Test Results" color="teal" />
             <TabButton tabId="roi-analysis" number="02" title="ROI Analysis" color="blue" />
             <TabButton tabId="detailed-report" number="03" title="Comprehensive Report" color="purple" />
           </div>
 
-          <div className="grid grid-cols-1 lg:grid-cols-4 gap-8">
-            <div className="lg:col-span-3">
-              {activeTab === 'test-results' && <TestResultsTab testResult={testResult} />}
-              {activeTab === 'roi-analysis' && <ROIAnalysisTab roiData={testResult.roi_analysis} />}
-              {activeTab === 'detailed-report' && <DetailedReportTab reportData={testResult.detailed_report} />}
-            </div>
-
-            <div className="lg:col-span-1">
-              <div className="space-y-6">
-                <div className="sticky top-4">
-                  <Card className="bg-black/80 border-gray-800 backdrop-blur-sm" style={{ width: '24rem', height: '32rem' }}>
-                    <CardHeader>
-                      <CardTitle className="text-white flex items-center space-x-2">
-                        <img src="/favicon.png" alt="AiAlive" className="w-5 h-5" />
-                        <span>AI Assistant - Freedom</span>
-                      </CardTitle>
-                      <CardDescription className="text-gray-300">
-                        Chat for follow-up questions and guidance
-                      </CardDescription>
-                    </CardHeader>
-                    <CardContent className="h-full flex flex-col">
-                      <div className="flex-1 bg-black/50 border-2 border-dashed border-gray-800 rounded-lg p-4 flex flex-col items-center justify-center">
-                        <img src="/favicon.png" alt="AiAlive" className="w-12 h-12 mb-4" />
-                        <p className="text-gray-300 text-sm mb-3 text-center">VAPI Widget Integration</p>
-                        <p className="text-xs text-gray-400 text-center">
-                          30-minute session included with your test results
-                        </p>
-                        <div className="mt-4 text-center">
-                          <p className="text-xs text-teal-400">After 30 minutes:</p>
-                          <p className="text-xs text-gray-400">Upgrade for continued access</p>
-                        </div>
-                        <div className="mt-6 space-y-2 w-full">
-                          <button className="w-full bg-teal-600 hover:bg-teal-700 text-white text-xs py-2 px-3 rounded transition-colors">
-                            AI Transformation Sessions - $100/mo
-                          </button>
-                          <button className="w-full bg-purple-600 hover:bg-purple-700 text-white text-xs py-2 px-3 rounded transition-colors">
-                            Devin-like Superpowers
-                          </button>
-                          <button className="w-full bg-blue-600 hover:bg-blue-700 text-white text-xs py-2 px-3 rounded transition-colors">
-                            Human Support Option
-                          </button>
-                        </div>
-                      </div>
-                    </CardContent>
-                  </Card>
-                </div>
-                
-                <SessionMetadataCard sessionData={testResult.session_metadata} />
-                <VoiceSummaryCard voiceData={testResult.voice_summary} />
-                <DataSourcesCard apiData={testResult.api_data_sources} />
-                <SubscriptionRecommendationsCard subData={testResult.subscription_recommendations} />
-              </div>
+          <div className="pr-96">
+            {activeTab === 'test-results' && <TestResultsTab testResult={testResult} />}
+            {activeTab === 'roi-analysis' && <ROIAnalysisTab roiData={testResult.roi_analysis} />}
+            {activeTab === 'detailed-report' && <DetailedReportTab reportData={testResult.detailed_report} />}
+            
+            {/* Additional cards positioned below main content */}
+            <div className="mt-8 space-y-6">
+              <SessionMetadataCard sessionData={testResult.session_metadata} />
+              <VoiceSummaryCard voiceData={testResult.voice_summary} />
+              <DataSourcesCard apiData={testResult.api_data_sources} />
+              <SubscriptionRecommendationsCard subData={testResult.subscription_recommendations} />
             </div>
           </div>
         </main>
