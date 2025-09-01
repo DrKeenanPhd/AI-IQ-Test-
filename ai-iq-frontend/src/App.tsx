@@ -353,7 +353,6 @@ function App() {
   if (!isAuthenticated) {
     return (
       <div className="min-h-screen bg-black">
-        <div className="absolute inset-0 bg-gradient-to-r from-teal-500/10 via-purple-500/10 to-teal-500/10"></div>
         
         <div className="relative z-10 flex items-center justify-center min-h-screen p-4">
           <Card className="w-full max-w-md bg-black/80 border-gray-800 backdrop-blur-sm">
@@ -432,8 +431,6 @@ function App() {
 
   return (
     <div className="min-h-screen bg-black">
-      <div className="absolute inset-0 bg-gradient-to-r from-teal-500/5 via-purple-500/5 to-teal-500/5"></div>
-      
       <div className="relative z-10">
         <header className="border-b border-gray-800/50 bg-black/30 backdrop-blur-sm">
           <div className="max-w-7xl mx-auto px-4 py-6">
