@@ -11,7 +11,7 @@ class GHLClient:
     def __init__(self):
         self.api_key = os.getenv("GHL_API_KEY")
         self.location_id = os.getenv("GHL_LOCATION_ID")
-        self.base_url = os.getenv("GHL_BASE_URL", "https://services.leadconnectorhq.com")
+        self.base_url = os.getenv("GHL_BASE_URL", "https://rest.gohighlevel.com")
         
         if not self.api_key or not self.location_id:
             logger.warning("GHL API credentials not configured. GHL integration will be disabled.")
@@ -55,13 +55,13 @@ class GHLClient:
                 if existing_contact:
                     contact_id = existing_contact["id"]
                     response = await client.put(
-                        f"{self.base_url}/contacts/{contact_id}",
+                        f"{self.base_url}/v1/contacts/{contact_id}",
                         headers=self.headers,
                         json=contact_data
                     )
                 else:
                     response = await client.post(
-                        f"{self.base_url}/contacts",
+                        f"{self.base_url}/v1/contacts/",
                         headers=self.headers,
                         json=contact_data
                     )
@@ -81,7 +81,7 @@ class GHLClient:
         try:
             async with httpx.AsyncClient() as client:
                 response = await client.get(
-                    f"{self.base_url}/contacts/search",
+                    f"{self.base_url}/v1/contacts/",
                     headers=self.headers,
                     params={"email": email, "locationId": self.location_id}
                 )
@@ -108,7 +108,7 @@ class GHLClient:
         try:
             async with httpx.AsyncClient() as client:
                 response = await client.put(
-                    f"{self.base_url}/contacts/{contact_id}",
+                    f"{self.base_url}/v1/contacts/{contact_id}",
                     headers=self.headers,
                     json={"customFields": custom_fields}
                 )
