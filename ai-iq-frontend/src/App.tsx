@@ -5,7 +5,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Progress } from '@/components/ui/progress'
 import { Badge } from '@/components/ui/badge'
 import { Alert, AlertDescription } from '@/components/ui/alert'
-import { Brain, TrendingUp, Users, Globe, MessageSquare, Target, CheckCircle, AlertTriangle, XCircle, Clock, Mic } from 'lucide-react'
+import { TrendingUp, CheckCircle, AlertTriangle, Clock, Mic, Target } from 'lucide-react'
 import './App.css'
 
 interface UserAuth {
@@ -57,6 +57,36 @@ interface TestResult {
     priority_level?: string
     estimated_roi_timeline?: string
   }
+  
+  roi_analysis?: {
+    estimated_monthly_savings: number
+    implementation_cost: number
+    roi_percentage: number
+    payback_period_months: number
+    productivity_gains: string[]
+    cost_reduction_areas: string[]
+    revenue_opportunities: string[]
+    risk_mitigation_value: number
+  }
+  
+  detailed_report?: {
+    executive_summary: string
+    current_state_analysis: Record<string, any>
+    recommended_solutions: Array<{
+      title: string
+      priority: string
+      timeline: string
+      investment: string
+    }>
+    implementation_roadmap: Array<{
+      phase: string
+      duration: string
+      focus: string
+    }>
+    success_metrics: string[]
+    next_steps: string[]
+    appendix_data?: Record<string, any>
+  }
 }
 
 function App() {
@@ -65,6 +95,28 @@ function App() {
   const [testResult, setTestResult] = useState<TestResult | null>(null)
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
+  const [activeTab, setActiveTab] = useState<'test-results' | 'roi-analysis' | 'detailed-report'>('test-results')
+
+  const TabButton: React.FC<{ 
+    tabId: 'test-results' | 'roi-analysis' | 'detailed-report', 
+    number: string, 
+    title: string, 
+    color: string 
+  }> = ({ tabId, number, title, color }) => (
+    <button
+      onClick={() => setActiveTab(tabId)}
+      className={`flex items-center space-x-3 px-6 py-4 rounded-lg transition-all ${
+        activeTab === tabId 
+          ? `bg-${color}-500/20 border-${color}-500 text-${color}-400` 
+          : 'bg-black/50 border-gray-800 text-gray-400 hover:border-gray-700'
+      } border-2`}
+    >
+      <span className={`text-2xl font-bold ${activeTab === tabId ? `text-${color}-400` : 'text-gray-500'}`}>
+        {number}
+      </span>
+      <span className="font-semibold">{title}</span>
+    </button>
+  )
   
   const [authForm, setAuthForm] = useState<UserAuth>({
     email: '',
@@ -115,25 +167,234 @@ function App() {
     }
   }
 
-  const getCategoryIcon = (category: string) => {
-    switch (category) {
-      case 'website_form_function': return <Globe className="w-6 h-6" />
-      case 'social_media_effectiveness': return <Users className="w-6 h-6" />
-      case 'digital_presence': return <TrendingUp className="w-6 h-6" />
-      case 'communication': return <MessageSquare className="w-6 h-6" />
-      case 'marketing': return <Target className="w-6 h-6" />
-      default: return <Brain className="w-6 h-6" />
-    }
-  }
 
   const getSeverityIcon = (severity: string) => {
     switch (severity) {
-      case 'high': return <XCircle className="w-5 h-5 text-red-400" />
-      case 'medium': return <AlertTriangle className="w-5 h-5 text-yellow-400" />
-      case 'low': return <CheckCircle className="w-5 h-5 text-green-400" />
-      default: return <AlertTriangle className="w-5 h-5 text-yellow-400" />
+      case 'critical':
+        return <AlertTriangle className="w-5 h-5 text-orange-400" />
+      case 'high':
+        return <AlertTriangle className="w-5 h-5 text-orange-400" />
+      case 'medium':
+        return <AlertTriangle className="w-5 h-5 text-yellow-400" />
+      case 'low':
+        return <CheckCircle className="w-5 h-5 text-blue-400" />
+      default:
+        return <CheckCircle className="w-5 h-5 text-gray-400" />
     }
   }
+
+
+  const TestResultsTab: React.FC<{ testResult: TestResult }> = ({ testResult }) => (
+    <div className="space-y-8">
+      <Card className="bg-black/80 border-gray-800 backdrop-blur-sm">
+        <CardHeader>
+          <CardTitle className="text-white flex items-center space-x-2">
+            <AlertTriangle className="w-6 h-6 text-yellow-400" />
+            <span>Critical Pain Points</span>
+          </CardTitle>
+        </CardHeader>
+        <CardContent className="space-y-4">
+          {Object.entries(testResult.pain_points).map(([key, point]: [string, any]) => (
+            <div key={key} className="flex items-start space-x-3 p-4 bg-black/50 rounded-lg">
+              {getSeverityIcon(point.severity)}
+              <div className="flex-1">
+                <h4 className="font-semibold text-white mb-1">{formatPainPointName(key)}</h4>
+                <p className="text-gray-300 text-sm mb-2">{point.description}</p>
+                <Badge variant={point.severity === 'high' ? 'destructive' : 'secondary'}>
+                  Score: {point.score}/100
+                </Badge>
+              </div>
+            </div>
+          ))}
+        </CardContent>
+      </Card>
+      
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        {Object.entries(testResult.categories).map(([key, category]: [string, any]) => (
+          <Card key={key} className="bg-black/80 border-gray-800 backdrop-blur-sm">
+            <CardHeader>
+              <CardTitle className="text-white text-lg">{formatCategoryName(key)}</CardTitle>
+              <CardDescription className="text-gray-300">
+                Score: {category.score}/{category.max_score}
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
+              <div className="space-y-3">
+                <div className="w-full bg-gray-800 rounded-full h-2">
+                  <div 
+                    className="bg-teal-500 h-2 rounded-full transition-all duration-300" 
+                    style={{ width: `${category.score}%` }}
+                  />
+                </div>
+                <p className="text-gray-300 text-sm">{category.description}</p>
+                {category.recommendations && category.recommendations.length > 0 && (
+                  <div className="mt-3">
+                    <h5 className="text-white font-medium mb-2">Recommendations:</h5>
+                    <ul className="text-gray-300 text-sm space-y-1">
+                      {category.recommendations.map((rec: string, idx: number) => (
+                        <li key={idx} className="flex items-start space-x-2">
+                          <span className="text-teal-400 mt-1">•</span>
+                          <span>{rec}</span>
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+                )}
+              </div>
+            </CardContent>
+          </Card>
+        ))}
+      </div>
+    </div>
+  )
+
+  const ROIAnalysisTab: React.FC<{ roiData: any }> = ({ roiData }) => (
+    <div className="space-y-8">
+      {roiData ? (
+        <>
+          <Card className="bg-black/80 border-gray-800 backdrop-blur-sm">
+            <CardHeader>
+              <CardTitle className="text-white flex items-center space-x-2">
+                <TrendingUp className="w-6 h-6 text-blue-400" />
+                <span>ROI Analysis</span>
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div className="space-y-4">
+                  <div className="bg-blue-500/20 border border-blue-500 rounded-lg p-4">
+                    <h4 className="text-blue-400 font-semibold mb-2">Monthly Savings</h4>
+                    <p className="text-2xl font-bold text-white">${roiData.estimated_monthly_savings?.toLocaleString()}</p>
+                  </div>
+                  <div className="bg-blue-500/20 border border-blue-500 rounded-lg p-4">
+                    <h4 className="text-blue-400 font-semibold mb-2">ROI Percentage</h4>
+                    <p className="text-2xl font-bold text-white">{roiData.roi_percentage?.toFixed(1)}%</p>
+                  </div>
+                </div>
+                <div className="space-y-4">
+                  <div className="bg-blue-500/20 border border-blue-500 rounded-lg p-4">
+                    <h4 className="text-blue-400 font-semibold mb-2">Implementation Cost</h4>
+                    <p className="text-2xl font-bold text-white">${roiData.implementation_cost?.toLocaleString()}</p>
+                  </div>
+                  <div className="bg-blue-500/20 border border-blue-500 rounded-lg p-4">
+                    <h4 className="text-blue-400 font-semibold mb-2">Payback Period</h4>
+                    <p className="text-2xl font-bold text-white">{roiData.payback_period_months} months</p>
+                  </div>
+                </div>
+              </div>
+              <div className="mt-6 grid grid-cols-1 md:grid-cols-3 gap-4">
+                <div>
+                  <h4 className="text-blue-400 font-semibold mb-3">Productivity Gains</h4>
+                  <ul className="text-gray-300 text-sm space-y-1">
+                    {roiData.productivity_gains?.map((gain: string, idx: number) => (
+                      <li key={idx} className="flex items-start space-x-2">
+                        <span className="text-blue-400 mt-1">•</span>
+                        <span>{gain}</span>
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+                <div>
+                  <h4 className="text-blue-400 font-semibold mb-3">Cost Reduction Areas</h4>
+                  <ul className="text-gray-300 text-sm space-y-1">
+                    {roiData.cost_reduction_areas?.map((area: string, idx: number) => (
+                      <li key={idx} className="flex items-start space-x-2">
+                        <span className="text-blue-400 mt-1">•</span>
+                        <span>{area}</span>
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+                <div>
+                  <h4 className="text-blue-400 font-semibold mb-3">Revenue Opportunities</h4>
+                  <ul className="text-gray-300 text-sm space-y-1">
+                    {roiData.revenue_opportunities?.map((opp: string, idx: number) => (
+                      <li key={idx} className="flex items-start space-x-2">
+                        <span className="text-blue-400 mt-1">•</span>
+                        <span>{opp}</span>
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+        </>
+      ) : (
+        <div className="text-center text-gray-400 py-12">
+          <p className="text-lg mb-4">ROI analysis will be available after VAPI integration</p>
+          <p className="text-sm">Complete your AI transformation assessment to unlock detailed ROI projections</p>
+        </div>
+      )}
+    </div>
+  )
+
+  const DetailedReportTab: React.FC<{ reportData: any }> = ({ reportData }) => (
+    <div className="space-y-8">
+      {reportData ? (
+        <>
+          <Card className="bg-black/80 border-gray-800 backdrop-blur-sm">
+            <CardHeader>
+              <CardTitle className="text-white flex items-center space-x-2">
+                <Target className="w-6 h-6 text-purple-400" />
+                <span>Comprehensive Report</span>
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="space-y-6">
+                <div>
+                  <h4 className="text-purple-400 font-semibold mb-3">Executive Summary</h4>
+                  <p className="text-gray-300">{reportData.executive_summary}</p>
+                </div>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  <div>
+                    <h4 className="text-purple-400 font-semibold mb-3">Recommended Solutions</h4>
+                    <div className="space-y-3">
+                      {reportData.recommended_solutions?.map((solution: any, idx: number) => (
+                        <div key={idx} className="bg-purple-500/20 border border-purple-500 rounded-lg p-3">
+                          <h5 className="text-white font-medium">{solution.title}</h5>
+                          <p className="text-sm text-gray-300 mt-1">Priority: {solution.priority}</p>
+                          <p className="text-sm text-gray-300">Timeline: {solution.timeline}</p>
+                          <p className="text-sm text-gray-300">Investment: {solution.investment}</p>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                  <div>
+                    <h4 className="text-purple-400 font-semibold mb-3">Success Metrics</h4>
+                    <ul className="text-gray-300 text-sm space-y-2">
+                      {reportData.success_metrics?.map((metric: string, idx: number) => (
+                        <li key={idx} className="flex items-start space-x-2">
+                          <span className="text-purple-400 mt-1">•</span>
+                          <span>{metric}</span>
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+                </div>
+                <div>
+                  <h4 className="text-purple-400 font-semibold mb-3">Next Steps</h4>
+                  <ul className="text-gray-300 text-sm space-y-2">
+                    {reportData.next_steps?.map((step: string, idx: number) => (
+                      <li key={idx} className="flex items-start space-x-2">
+                        <span className="text-purple-400 mt-1">{idx + 1}.</span>
+                        <span>{step}</span>
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+        </>
+      ) : (
+        <div className="text-center text-gray-400 py-12">
+          <p className="text-lg mb-4">Detailed report will be available after VAPI integration</p>
+          <p className="text-sm">Complete your AI transformation assessment to unlock comprehensive analysis</p>
+        </div>
+      )}
+    </div>
+  )
 
   const formatCategoryName = (key: string) => {
     return key.split('_').map(word => 
@@ -232,11 +493,11 @@ function App() {
           
           {voiceData.client_concerns_expressed && voiceData.client_concerns_expressed.length > 0 && (
             <div>
-              <h5 className="text-sm font-semibold text-red-400 mb-2">Client Concerns</h5>
+              <h5 className="text-sm font-semibold text-orange-400 mb-2">Client Concerns</h5>
               <ul className="space-y-1">
                 {voiceData.client_concerns_expressed.map((concern, idx) => (
                   <li key={idx} className="flex items-start space-x-2">
-                    <AlertTriangle className="w-3 h-3 text-red-400 mt-1 flex-shrink-0" />
+                    <AlertTriangle className="w-3 h-3 text-orange-400 mt-1 flex-shrink-0" />
                     <span className="text-gray-300 text-sm">{concern}</span>
                   </li>
                 ))}
@@ -299,7 +560,7 @@ function App() {
     
     const getPriorityColor = (priority: string) => {
       switch (priority) {
-        case 'urgent': return 'text-red-400 border-red-400';
+        case 'urgent': return 'text-orange-400 border-orange-400';
         case 'high': return 'text-orange-400 border-orange-400';
         case 'medium': return 'text-yellow-400 border-yellow-400';
         case 'low': return 'text-green-400 border-green-400';
@@ -398,8 +659,8 @@ function App() {
                   />
                 </div>
                 {error && (
-                  <Alert className="bg-red-900/50 border-red-700">
-                    <AlertDescription className="text-red-200">{error}</AlertDescription>
+                  <Alert className="bg-orange-900/50 border-orange-700">
+                    <AlertDescription className="text-orange-200">{error}</AlertDescription>
                   </Alert>
                 )}
                 <Button 
@@ -435,9 +696,17 @@ function App() {
         <header className="border-b border-gray-800/50 bg-black/30 backdrop-blur-sm">
           <div className="max-w-7xl mx-auto px-4 py-6">
             <div className="flex items-center justify-between">
-              <div className="flex items-center space-x-3">
-                <img src="/logo.png" alt="AiAlive" className="w-8 h-8" />
-                <h1 className="text-2xl font-bold text-white">AI IQ Test Results</h1>
+              <div className="flex items-center space-x-6">
+                <img src="/logo.png" alt="AiAlive" className="w-12 h-12" />
+                <div className="flex flex-col">
+                  <div className="inline-flex items-center justify-center w-16 h-16 bg-gradient-to-r from-teal-500 to-purple-600 rounded-full">
+                    <span className="text-2xl font-bold text-white">{testResult.overall_score}</span>
+                  </div>
+                  <span className="text-sm font-semibold text-white mt-1">Your AI IQ Score</span>
+                </div>
+              </div>
+              <div className="text-center flex-1">
+                <h1 className="text-2xl font-bold text-white">Test Results</h1>
               </div>
               <div className="text-right">
                 <p className="text-white font-semibold">{testResult.user_name}</p>
@@ -448,199 +717,75 @@ function App() {
         </header>
 
         <main className="max-w-7xl mx-auto px-4 py-8 space-y-8">
-          <div className="text-center mb-12">
-            <div className="inline-flex items-center justify-center w-24 h-24 bg-gradient-to-r from-teal-500 to-purple-600 rounded-full mb-6">
-              <span className="text-3xl font-bold text-white">{testResult.overall_score}</span>
-            </div>
-            <h2 className="text-4xl font-bold text-white mb-4">Your AI IQ Score</h2>
-            <p className="text-xl text-gray-300 max-w-2xl mx-auto">
-              Based on our comprehensive analysis of your business across 5 key categories
-            </p>
+          <div className="text-center mb-8">
+            <ul className="text-gray-300 space-y-2 max-w-2xl mx-auto">
+              <li>• Comprehensive AI readiness assessment completed</li>
+              <li>• {Object.keys(testResult.pain_points).length} critical areas identified</li>
+              <li>• {Object.keys(testResult.categories).length} business categories analyzed</li>
+              <li>• Personalized recommendations generated</li>
+            </ul>
           </div>
 
-          <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 mb-12">
-            <div className="lg:col-span-2 space-y-8">
-              <Card className="bg-black/80 border-gray-800 backdrop-blur-sm">
-                <CardHeader>
-                  <CardTitle className="text-white flex items-center space-x-2">
-                    <AlertTriangle className="w-6 h-6 text-yellow-400" />
-                    <span>Critical Pain Points</span>
-                  </CardTitle>
-                </CardHeader>
-                <CardContent className="space-y-4">
-                  {Object.entries(testResult.pain_points).map(([key, point]: [string, any]) => (
-                    <div key={key} className="flex items-start space-x-3 p-4 bg-black/50 rounded-lg">
-                      {getSeverityIcon(point.severity)}
-                      <div className="flex-1">
-                        <h4 className="font-semibold text-white mb-1">{formatPainPointName(key)}</h4>
-                        <p className="text-gray-300 text-sm mb-2">{point.description}</p>
-                        <Badge variant={point.severity === 'high' ? 'destructive' : 'secondary'}>
-                          Score: {point.score}/10
-                        </Badge>
-                      </div>
-                    </div>
-                  ))}
-                </CardContent>
-              </Card>
+          <div className="flex flex-col lg:flex-row gap-4 mb-8">
+            <TabButton tabId="test-results" number="01" title="AI IQ Test Results" color="teal" />
+            <TabButton tabId="roi-analysis" number="02" title="ROI Analysis" color="blue" />
+            <TabButton tabId="detailed-report" number="03" title="Comprehensive Report" color="purple" />
+          </div>
 
-              <div className={`grid gap-6 ${
-                Object.keys(testResult.categories).length <= 3 
-                  ? 'grid-cols-1 md:grid-cols-2 lg:grid-cols-3' 
-                  : Object.keys(testResult.categories).length <= 5
-                  ? 'grid-cols-1 md:grid-cols-2 lg:grid-cols-3'
-                  : 'grid-cols-1 md:grid-cols-2 lg:grid-cols-3'
-              }`}>
-                {Object.entries(testResult.categories).map(([key, category]: [string, any]) => (
-                  <Card key={key} className="bg-black/80 border-gray-800 backdrop-blur-sm">
-                    <CardHeader className="pb-3">
-                      <div className="flex items-center space-x-2 mb-2">
-                        {getCategoryIcon(key)}
-                        <CardTitle className="text-lg text-white">{formatCategoryName(key)}</CardTitle>
-                      </div>
-                      <div className="space-y-2">
-                        <div className="flex justify-between items-center">
-                          <span className="text-2xl font-bold text-white">{category.score}</span>
-                          <span className="text-sm text-gray-400">/ {category.max_score}</span>
-                        </div>
-                        <Progress value={category.percentage} className="h-2" />
-                        <p className="text-sm text-gray-300">{category.percentage}% Complete</p>
-                      </div>
+          <div className="grid grid-cols-1 lg:grid-cols-4 gap-8">
+            <div className="lg:col-span-3">
+              {activeTab === 'test-results' && <TestResultsTab testResult={testResult} />}
+              {activeTab === 'roi-analysis' && <ROIAnalysisTab roiData={testResult.roi_analysis} />}
+              {activeTab === 'detailed-report' && <DetailedReportTab reportData={testResult.detailed_report} />}
+            </div>
+
+            <div className="lg:col-span-1">
+              <div className="space-y-6">
+                <div className="sticky top-4">
+                  <Card className="bg-black/80 border-gray-800 backdrop-blur-sm" style={{ width: '24rem', height: '32rem' }}>
+                    <CardHeader>
+                      <CardTitle className="text-white flex items-center space-x-2">
+                        <img src="/favicon.png" alt="AiAlive" className="w-5 h-5" />
+                        <span>AI Assistant - Freedom</span>
+                      </CardTitle>
+                      <CardDescription className="text-gray-300">
+                        Chat for follow-up questions and guidance
+                      </CardDescription>
                     </CardHeader>
-                    <CardContent className="pt-0">
-                      <div className="space-y-3">
-                        <div>
-                          <h5 className="text-sm font-semibold text-green-400 mb-1">Strengths</h5>
-                          <ul className="text-xs text-gray-300 space-y-1">
-                            {category.strengths?.map((strength: string, idx: number) => (
-                              <li key={idx} className="flex items-start space-x-1">
-                                <CheckCircle className="w-3 h-3 text-green-400 mt-0.5 flex-shrink-0" />
-                                <span>{strength}</span>
-                              </li>
-                            ))}
-                          </ul>
+                    <CardContent className="h-full flex flex-col">
+                      <div className="flex-1 bg-black/50 border-2 border-dashed border-gray-800 rounded-lg p-4 flex flex-col items-center justify-center">
+                        <img src="/favicon.png" alt="AiAlive" className="w-12 h-12 mb-4" />
+                        <p className="text-gray-300 text-sm mb-3 text-center">VAPI Widget Integration</p>
+                        <p className="text-xs text-gray-400 text-center">
+                          30-minute session included with your test results
+                        </p>
+                        <div className="mt-4 text-center">
+                          <p className="text-xs text-teal-400">After 30 minutes:</p>
+                          <p className="text-xs text-gray-400">Upgrade for continued access</p>
                         </div>
-                        <div>
-                          <h5 className="text-sm font-semibold text-red-400 mb-1">Areas for Improvement</h5>
-                          <ul className="text-xs text-gray-300 space-y-1">
-                            {category.weaknesses?.map((weakness: string, idx: number) => (
-                              <li key={idx} className="flex items-start space-x-1">
-                                <XCircle className="w-3 h-3 text-red-400 mt-0.5 flex-shrink-0" />
-                                <span>{weakness}</span>
-                              </li>
-                            ))}
-                          </ul>
+                        <div className="mt-6 space-y-2 w-full">
+                          <button className="w-full bg-teal-600 hover:bg-teal-700 text-white text-xs py-2 px-3 rounded transition-colors">
+                            AI Transformation Sessions - $100/mo
+                          </button>
+                          <button className="w-full bg-purple-600 hover:bg-purple-700 text-white text-xs py-2 px-3 rounded transition-colors">
+                            Devin-like Superpowers
+                          </button>
+                          <button className="w-full bg-blue-600 hover:bg-blue-700 text-white text-xs py-2 px-3 rounded transition-colors">
+                            Human Support Option
+                          </button>
                         </div>
                       </div>
                     </CardContent>
                   </Card>
-                ))}
+                </div>
+                
+                <SessionMetadataCard sessionData={testResult.session_metadata} />
+                <VoiceSummaryCard voiceData={testResult.voice_summary} />
+                <DataSourcesCard apiData={testResult.api_data_sources} />
+                <SubscriptionRecommendationsCard subData={testResult.subscription_recommendations} />
               </div>
-            </div>
-
-            <div className="space-y-6">
-              <Card className="bg-black/80 border-gray-800 backdrop-blur-sm">
-                <CardHeader>
-                  <CardTitle className="text-white">AI Assistant</CardTitle>
-                  <CardDescription className="text-gray-300">
-                    Chat with Freedom for follow-up questions
-                  </CardDescription>
-                </CardHeader>
-                <CardContent>
-                  <div className="bg-black/50 border-2 border-dashed border-gray-800 rounded-lg p-6 text-center">
-                    <img src="/logo.png" alt="AiAlive" className="w-10 h-10 mx-auto mb-3" />
-                    <p className="text-gray-300 text-sm mb-3">VAPI Widget Here</p>
-                    <p className="text-xs text-gray-400">
-                      Insert your VAPI HTML code here to activate your AI assistant
-                    </p>
-                  </div>
-                </CardContent>
-              </Card>
-
-              <SessionMetadataCard sessionData={testResult.session_metadata} />
-              <VoiceSummaryCard voiceData={testResult.voice_summary} />
-              <DataSourcesCard apiData={testResult.api_data_sources} />
-              <SubscriptionRecommendationsCard subData={testResult.subscription_recommendations} />
             </div>
           </div>
-
-
-          <Card className="bg-black/80 border-gray-800 backdrop-blur-sm">
-            <CardHeader>
-              <CardTitle className="text-white flex items-center space-x-2">
-                <Target className="w-6 h-6 text-teal-400" />
-                <span>Recommended Action Plan</span>
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <div>
-                  <h4 className="text-lg font-semibold text-white mb-4">Strategic Recommendations</h4>
-                  <ul className="space-y-3">
-                    {testResult.recommendations.map((rec, idx) => (
-                      <li key={idx} className="flex items-start space-x-3">
-                        <div className="flex-shrink-0 w-6 h-6 bg-gradient-to-r from-teal-500 to-purple-600 rounded-full flex items-center justify-center">
-                          <span className="text-xs font-bold text-white">{idx + 1}</span>
-                        </div>
-                        <p className="text-gray-300">{rec}</p>
-                      </li>
-                    ))}
-                  </ul>
-                </div>
-                <div>
-                  <h4 className="text-lg font-semibold text-white mb-4">Priority Actions</h4>
-                  <div className="space-y-4">
-                    {Object.entries(testResult.categories).map(([key, category]: [string, any]) => (
-                      <div key={key} className="bg-black/50 rounded-lg p-4">
-                        <h5 className="font-semibold text-white mb-2">{formatCategoryName(key)}</h5>
-                        <ul className="text-sm text-gray-300 space-y-1">
-                          {category.priority_actions?.map((action: string, idx: number) => (
-                            <li key={idx} className="flex items-start space-x-2">
-                              <TrendingUp className="w-3 h-3 text-teal-400 mt-1 flex-shrink-0" />
-                              <span>{action}</span>
-                            </li>
-                          ))}
-                        </ul>
-                      </div>
-                    ))}
-                  </div>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
-
-          {testResult.custom_sections && Object.entries(testResult.custom_sections).map(([key, section]: [string, any]) => (
-            <Card key={key} className="bg-black/80 border-gray-800 backdrop-blur-sm">
-              <CardHeader>
-                <CardTitle className="text-white flex items-center space-x-2">
-                  <img src="/logo.png" alt="AiAlive" className="w-6 h-6" />
-                  <span>{section.title}</span>
-                </CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className="space-y-4">
-                  {Object.entries(section.content).map(([contentKey, contentValue]: [string, any]) => (
-                    <div key={contentKey}>
-                      <h4 className="text-lg font-semibold text-white mb-2 capitalize">
-                        {contentKey.replace(/_/g, ' ')}
-                      </h4>
-                      {Array.isArray(contentValue) ? (
-                        <ul className="space-y-2">
-                          {contentValue.map((item: string, idx: number) => (
-                            <li key={idx} className="flex items-start space-x-2">
-                              <CheckCircle className="w-4 h-4 text-teal-400 mt-1 flex-shrink-0" />
-                              <span className="text-gray-300">{item}</span>
-                            </li>
-                          ))}
-                        </ul>
-                      ) : (
-                        <p className="text-gray-300">{contentValue}</p>
-                      )}
-                    </div>
-                  ))}
-                </div>
-              </CardContent>
-            </Card>
-          ))}
         </main>
       </div>
     </div>

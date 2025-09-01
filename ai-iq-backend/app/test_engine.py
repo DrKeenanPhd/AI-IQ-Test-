@@ -5,7 +5,8 @@ from datetime import datetime
 import random
 from .models import (
     DynamicTestResult, PainPoint, Category, DynamicSection, 
-    TestParameter, SeverityLevel, SectionType, ConfigurationSettings
+    TestParameter, SeverityLevel, SectionType, ConfigurationSettings,
+    ROIAnalysis, DetailedReport
 )
 
 class AIIQTestEngine:
@@ -428,12 +429,12 @@ class AIIQTestEngine:
         pain_points: Dict[str, PainPoint], 
         categories: Dict[str, Category]
     ) -> int:
-        """Calculate overall AI IQ score"""
+        """Calculate overall AI IQ score (0-100 scale)"""
         category_total = sum(cat.score for cat in categories.values())
         pain_point_penalty = sum(pp.score for pp in pain_points.values()) * 2
         
         base_score = category_total - pain_point_penalty
-        return max(50, min(200, base_score))
+        return max(25, min(100, base_score))
     
     def _generate_recommendations(
         self, 
@@ -465,3 +466,74 @@ class AIIQTestEngine:
             recommendations.append("Focus improvement efforts on underperforming categories")
         
         return recommendations
+    
+    def _generate_roi_analysis(self, overall_score: int, pain_points: Dict[str, PainPoint]) -> ROIAnalysis:
+        """Generate ROI analysis based on test results"""
+        
+        base_savings = 5000 + (overall_score * 100)
+        implementation_cost = 15000 + (len(pain_points) * 2000)
+        
+        return ROIAnalysis(
+            estimated_monthly_savings=base_savings,
+            implementation_cost=implementation_cost,
+            roi_percentage=((base_savings * 12 - implementation_cost) / implementation_cost) * 100,
+            payback_period_months=max(1, int(implementation_cost / base_savings)),
+            productivity_gains=[
+                "Automated customer service responses",
+                "Streamlined content creation process",
+                "Enhanced data analysis capabilities"
+            ],
+            cost_reduction_areas=[
+                "Manual task automation",
+                "Reduced customer service overhead",
+                "Optimized marketing spend"
+            ],
+            revenue_opportunities=[
+                "Improved customer retention",
+                "Enhanced lead conversion",
+                "New service offerings"
+            ],
+            risk_mitigation_value=implementation_cost * 0.3
+        )
+    
+    def _generate_detailed_report(self, pain_points: Dict[str, PainPoint], categories: Dict[str, Category]) -> DetailedReport:
+        """Generate detailed comprehensive report"""
+        
+        return DetailedReport(
+            executive_summary="Comprehensive AI readiness assessment reveals key opportunities for transformation.",
+            current_state_analysis={
+                "strengths": ["Existing digital infrastructure", "Team adaptability"],
+                "weaknesses": ["Limited AI integration", "Manual processes"],
+                "opportunities": ["Market expansion", "Efficiency gains"],
+                "threats": ["Competitor advancement", "Technology gaps"]
+            },
+            recommended_solutions=[
+                {
+                    "title": "AI-Powered Customer Service",
+                    "priority": "High",
+                    "timeline": "3-6 months",
+                    "investment": "$25,000"
+                },
+                {
+                    "title": "Marketing Automation Platform",
+                    "priority": "Medium",
+                    "timeline": "6-9 months", 
+                    "investment": "$15,000"
+                }
+            ],
+            implementation_roadmap=[
+                {"phase": "Phase 1", "duration": "Months 1-3", "focus": "Foundation Setup"},
+                {"phase": "Phase 2", "duration": "Months 4-6", "focus": "Core Implementation"},
+                {"phase": "Phase 3", "duration": "Months 7-12", "focus": "Optimization & Scale"}
+            ],
+            success_metrics=[
+                "Customer satisfaction increase by 25%",
+                "Operational efficiency improvement by 40%",
+                "Revenue growth of 15% within 12 months"
+            ],
+            next_steps=[
+                "Schedule implementation planning session",
+                "Identify key stakeholders and champions",
+                "Develop detailed project timeline"
+            ]
+        )

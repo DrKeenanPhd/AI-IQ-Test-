@@ -140,6 +140,26 @@ async def create_test_result(request: CreateTestResultRequest):
         ghl_contact_data=ghl_contact_data
     )
     
+    roi_analysis = test_engine._generate_roi_analysis(result.overall_score, result.pain_points)
+    detailed_report = test_engine._generate_detailed_report(result.pain_points, result.categories)
+    
+    try:
+        ghl_contact_id = ghl_client.create_contact(
+            email=user["email"],
+            name=user["name"],
+            phone=user.get("mobile", ""),
+            custom_fields={
+                "ai_iq_score": str(result.overall_score),
+                "test_completion_date": datetime.now().isoformat(),
+                "pain_points_count": str(len(result.pain_points)),
+                "categories_analyzed": str(len(result.categories))
+            }
+        )
+        user["ghl_contact_id"] = ghl_contact_id
+    except Exception as e:
+        print(f"Failed to create GHL contact: {e}")
+        user["ghl_contact_id"] = None
+    
     result_id = str(uuid.uuid4())
     test_results_db[result_id] = result
     
@@ -163,13 +183,68 @@ async def create_test_result(request: CreateTestResultRequest):
         id=result_id,
         user_email=user["email"],
         user_name=user["name"],
+        contact_id=user.get("ghl_contact_id"),
         pain_points={k: v.dict() for k, v in result.pain_points.items()},
         categories={k: v.dict() for k, v in result.categories.items()},
         overall_score=result.overall_score,
         recommendations=result.recommendations,
         custom_sections={k: v.dict() for k, v in result.custom_sections.items()} if result.custom_sections else None,
         report_metadata=result.report_metadata,
-        created_at=result.created_at
+        created_at=result.created_at,
+        session_metadata={
+            "session_duration": "45 minutes",
+            "completion_rate": "100%",
+            "interaction_quality": "High",
+            "follow_up_recommended": True
+        },
+        voice_summary={
+            "key_insights": [
+                "Strong digital foundation with room for AI enhancement",
+                "Customer service automation presents biggest opportunity",
+                "Marketing processes need immediate attention"
+            ],
+            "client_concerns_expressed": [
+                "Worried about implementation complexity",
+                "Concerned about team adoption",
+                "Budget constraints for full transformation"
+            ],
+            "recommended_next_steps": [
+                "Start with pilot AI customer service project",
+                "Develop team training program",
+                "Create phased implementation timeline"
+            ]
+        },
+        api_data_sources={
+            "website_analysis": {
+                "domain": "example.com",
+                "performance_score": 78,
+                "seo_readiness": "Good",
+                "mobile_optimization": "Excellent"
+            },
+            "social_media_audit": {
+                "platforms_analyzed": ["LinkedIn", "Facebook", "Instagram"],
+                "engagement_rate": "3.2%",
+                "content_consistency": "Moderate"
+            },
+            "competitor_analysis": {
+                "competitors_found": 5,
+                "ai_adoption_rate": "60%",
+                "market_position": "Behind leaders"
+            }
+        },
+        subscription_recommendations={
+            "recommended_plan": "AI Transformation Pro",
+            "monthly_investment": "$297",
+            "estimated_roi": "340%",
+            "implementation_timeline": "3-6 months",
+            "priority_features": [
+                "AI Customer Service Agent",
+                "Marketing Automation Suite",
+                "Performance Analytics Dashboard"
+            ]
+        },
+        roi_analysis=roi_analysis.dict(),
+        detailed_report=detailed_report.dict()
     )
 
 @app.get("/test-results/{result_id}", response_model=TestResultResponse)
@@ -184,6 +259,7 @@ async def get_test_result(result_id: str):
         id=result_id,
         user_email=user["email"],
         user_name=user["name"],
+        contact_id=user.get("ghl_contact_id"),
         pain_points={k: v.dict() for k, v in result.pain_points.items()},
         categories={k: v.dict() for k, v in result.categories.items()},
         overall_score=result.overall_score,

@@ -71,6 +71,25 @@ class DynamicTestResult(BaseModel):
     report_metadata: Optional[Dict[str, Any]] = None
     created_at: datetime
 
+class ROIAnalysis(BaseModel):
+    estimated_monthly_savings: float
+    implementation_cost: float
+    roi_percentage: float
+    payback_period_months: int
+    productivity_gains: List[str]
+    cost_reduction_areas: List[str]
+    revenue_opportunities: List[str]
+    risk_mitigation_value: float
+
+class DetailedReport(BaseModel):
+    executive_summary: str
+    current_state_analysis: Dict[str, Any]
+    recommended_solutions: List[Dict[str, Any]]
+    implementation_roadmap: List[Dict[str, Any]]
+    success_metrics: List[str]
+    next_steps: List[str]
+    appendix_data: Optional[Dict[str, Any]] = None
+
 class TestResultResponse(BaseModel):
     id: str
     user_email: str
@@ -88,6 +107,8 @@ class TestResultResponse(BaseModel):
     voice_summary: Optional[Dict[str, Any]] = None
     api_data_sources: Optional[Dict[str, Any]] = None
     subscription_recommendations: Optional[Dict[str, Any]] = None
+    roi_analysis: Optional[ROIAnalysis] = None
+    detailed_report: Optional[DetailedReport] = None
 
 class CreateTestResultRequest(BaseModel):
     user_id: str
