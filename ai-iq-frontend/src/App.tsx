@@ -308,7 +308,7 @@ function App() {
     };
     
     return (
-      <Card className="bg-gray-800/50 border-gray-700 backdrop-blur-sm">
+      <Card className="bg-black/80 border-gray-800 backdrop-blur-sm">
         <CardHeader>
           <CardTitle className="text-white flex items-center space-x-2">
             <Target className="w-5 h-5 text-purple-400" />
@@ -358,7 +358,7 @@ function App() {
           <Card className="w-full max-w-md bg-black/80 border-gray-800 backdrop-blur-sm">
             <CardHeader className="text-center">
               <div className="flex items-center justify-center mb-4">
-                <img src="/logo.png" alt="AiAlive" className="w-10 h-10" />
+                <img src="/favicon.png" alt="AiAlive" className="w-10 h-10" />
               </div>
               <CardTitle className="text-2xl font-bold text-white">AI IQ Test Results</CardTitle>
               <CardDescription className="text-gray-300">
@@ -421,7 +421,7 @@ function App() {
     return (
       <div className="min-h-screen bg-black flex items-center justify-center">
         <div className="text-center text-white">
-          <img src="/logo.png" alt="AiAlive" className="w-16 h-16 mx-auto mb-4 animate-pulse" />
+          <img src="/favicon.png" alt="AiAlive" className="w-16 h-16 mx-auto mb-4 animate-pulse" />
           <h2 className="text-2xl font-bold mb-2">Generating Your AI IQ Report</h2>
           <p className="text-gray-300">Please wait while we analyze your data...</p>
         </div>
@@ -469,7 +469,7 @@ function App() {
                 </CardHeader>
                 <CardContent className="space-y-4">
                   {Object.entries(testResult.pain_points).map(([key, point]: [string, any]) => (
-                    <div key={key} className="flex items-start space-x-3 p-4 bg-gray-700/30 rounded-lg">
+                    <div key={key} className="flex items-start space-x-3 p-4 bg-black/50 rounded-lg">
                       {getSeverityIcon(point.severity)}
                       <div className="flex-1">
                         <h4 className="font-semibold text-white mb-1">{formatPainPointName(key)}</h4>
@@ -546,7 +546,7 @@ function App() {
                   </CardDescription>
                 </CardHeader>
                 <CardContent>
-                  <div className="bg-gray-700/30 border-2 border-dashed border-gray-600 rounded-lg p-6 text-center">
+                  <div className="bg-black/50 border-2 border-dashed border-gray-800 rounded-lg p-6 text-center">
                     <img src="/logo.png" alt="AiAlive" className="w-10 h-10 mx-auto mb-3" />
                     <p className="text-gray-300 text-sm mb-3">VAPI Widget Here</p>
                     <p className="text-xs text-gray-400">
@@ -590,7 +590,7 @@ function App() {
                   <h4 className="text-lg font-semibold text-white mb-4">Priority Actions</h4>
                   <div className="space-y-4">
                     {Object.entries(testResult.categories).map(([key, category]: [string, any]) => (
-                      <div key={key} className="bg-gray-700/30 rounded-lg p-4">
+                      <div key={key} className="bg-black/50 rounded-lg p-4">
                         <h5 className="font-semibold text-white mb-2">{formatCategoryName(key)}</h5>
                         <ul className="text-sm text-gray-300 space-y-1">
                           {category.priority_actions?.map((action: string, idx: number) => (
