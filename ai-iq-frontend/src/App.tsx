@@ -788,7 +788,7 @@ function App() {
 
         <main className="max-w-7xl mx-auto px-4 py-8 space-y-8 relative">
           {/* AI Agent Widget - Floating 5% from right edge */}
-          <div className="fixed top-4 z-50" style={{ right: '5%' }}>
+          <div className="fixed top-4 right-4 z-50">
             <Card className="bg-black/80 border-gray-800 backdrop-blur-sm" style={{ width: '24rem', height: '32rem' }}>
               <CardHeader>
                 <CardTitle className="text-white flex items-center space-x-2">
