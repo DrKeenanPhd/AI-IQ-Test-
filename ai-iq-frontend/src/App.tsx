@@ -787,45 +787,17 @@ function App() {
         </header>
 
         <main className="max-w-7xl mx-auto px-4 py-8 space-y-8 relative">
-          {/* AI Agent Widget - Floating 5% from right edge */}
-          <div className="fixed top-4 right-4 z-50">
-            <Card className="bg-black/80 border-gray-800 backdrop-blur-sm" style={{ width: '24rem', height: '32rem' }}>
-              <CardHeader>
-                <CardTitle className="text-white flex items-center space-x-2">
-                  <img src="/favicon.png" alt="AiAlive" className="w-5 h-5" />
-                  <span>AI Assistant - Freedom</span>
-                </CardTitle>
-                <CardDescription className="text-gray-300">
-                  Chat for follow-up questions and guidance
-                </CardDescription>
-              </CardHeader>
-              <CardContent className="h-full flex flex-col">
-                <div className="flex-1 bg-black/50 border-2 border-dashed border-gray-800 rounded-lg p-4 flex flex-col items-center justify-center">
-                  <img src="/favicon.png" alt="AiAlive" className="w-12 h-12 mb-4" />
-                  <p className="text-gray-300 text-sm mb-3 text-center">VAPI Widget Integration</p>
-                  <p className="text-xs text-gray-400 text-center">
-                    30-minute session included with your test results
-                  </p>
-                  <div className="mt-4 text-center">
-                    <p className="text-xs text-teal-400">After 30 minutes:</p>
-                    <p className="text-xs text-gray-400">Upgrade for continued access</p>
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
-            
-            {/* CTA Buttons positioned just under the widget */}
-            <div className="mt-4 space-y-2">
-              <button className="w-full bg-teal-600 hover:bg-teal-700 text-white text-sm py-3 px-4 rounded transition-colors">
-                AI Transformation Sessions - $100/mo
-              </button>
-              <button className="w-full bg-purple-600 hover:bg-purple-700 text-white text-sm py-3 px-4 rounded transition-colors">
-                Devin-like Superpowers
-              </button>
-              <button className="w-full bg-blue-600 hover:bg-blue-700 text-white text-sm py-3 px-4 rounded transition-colors">
-                Human Support Option
-              </button>
-            </div>
+          {/* CTA Buttons positioned at far right edge */}
+          <div className="fixed top-4 right-4 z-50 space-y-2" style={{ width: '9.6rem' }}>
+            <button className="w-full bg-teal-600 hover:bg-teal-700 text-white text-sm py-3 px-4 rounded transition-colors">
+              AI Transformation Sessions - $100/mo
+            </button>
+            <button className="w-full bg-purple-600 hover:bg-purple-700 text-white text-sm py-3 px-4 rounded transition-colors">
+              Devin-like Superpowers
+            </button>
+            <button className="w-full bg-blue-600 hover:bg-blue-700 text-white text-sm py-3 px-4 rounded transition-colors">
+              Human Support Option
+            </button>
           </div>
 
           {/* AI IQ Score positioned beneath header */}
