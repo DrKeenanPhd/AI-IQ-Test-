@@ -159,3 +159,23 @@ git push origin production
 - Production branch always stable
 - Clear separation of concerns
 - Minimal merge conflicts
+
+## Current Deployment URLs
+
+### Production
+- **URL:** https://ai-iq-frontend.vercel.app/
+- **Branch:** production
+- **Status:** Active deployment
+- **Version:** v0.1.0 (tagged)
+
+### Development
+- **Target URL:** https://ai-iq-frontend-git-dev-drkeenanphd.vercel.app/
+- **Branch:** dev
+- **Status:** Needs configuration (currently 404)
+- **Version:** Latest dev commits
+
+### Features
+- **280px Logo:** ✅ Implemented in both branches
+- **VAPI Widget Removal:** ✅ Implemented in both branches  
+- **CTA Button Repositioning:** ✅ Implemented in both branches
+- **Lint Fixes:** ✅ Zero errors remaining
