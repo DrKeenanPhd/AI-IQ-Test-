@@ -14,17 +14,48 @@ interface UserAuth {
   mobile: string
 }
 
+interface PainPoint {
+  score: number
+  description: string
+  severity: 'low' | 'medium' | 'high' | 'critical'
+  recommendations: string[]
+  impact_areas: string[]
+  custom_data?: Record<string, unknown>
+}
+
+interface Category {
+  score: number
+  max_score: number
+  percentage: number
+  description: string
+  recommendations: string[]
+  strengths: string[]
+  weaknesses: string[]
+  priority_actions: string[]
+  custom_metrics?: Record<string, unknown>
+}
+
+interface DynamicSection {
+  title: string
+  content: Record<string, unknown>
+  display_order: number
+  section_type: 'pain_point' | 'category' | 'custom' | 'recommendation'
+  is_expandable: boolean
+  min_height?: string
+  max_height?: string
+}
+
 interface TestResult {
   id: string
   user_email: string
   user_name: string
   contact_id?: string
-  pain_points: Record<string, any>
-  categories: Record<string, any>
+  pain_points: Record<string, PainPoint>
+  categories: Record<string, Category>
   overall_score: number
   recommendations: string[]
-  custom_sections?: Record<string, any>
-  report_metadata?: Record<string, any>
+  custom_sections?: Record<string, DynamicSection>
+  report_metadata?: Record<string, unknown>
   created_at: string
   
   session_metadata?: {
@@ -71,7 +102,7 @@ interface TestResult {
   
   detailed_report?: {
     executive_summary: string
-    current_state_analysis: Record<string, any>
+    current_state_analysis: Record<string, unknown>
     recommended_solutions: Array<{
       title: string
       priority: string
@@ -85,7 +116,7 @@ interface TestResult {
     }>
     success_metrics: string[]
     next_steps: string[]
-    appendix_data?: Record<string, any>
+    appendix_data?: Record<string, unknown>
   }
 }
 
@@ -199,7 +230,7 @@ function App() {
         </CardHeader>
         <CardContent>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {Object.entries(testResult.categories).map(([key, category]: [string, any]) => (
+            {Object.entries(testResult.categories).map(([key, category]: [string, Category]) => (
               <Card key={key} className="bg-black/50 border-gray-700">
                 <CardHeader>
                   <CardTitle className="text-white text-lg">{formatCategoryName(key)}</CardTitle>
@@ -278,7 +309,7 @@ function App() {
           </CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
-          {Object.entries(testResult.pain_points).map(([key, point]: [string, any]) => (
+          {Object.entries(testResult.pain_points).map(([key, point]: [string, PainPoint]) => (
             <div key={key} className="flex items-start space-x-3 p-4 bg-black/50 rounded-lg">
               {getSeverityIcon(point.severity)}
               <div className="flex-1">
@@ -295,7 +326,7 @@ function App() {
     </div>
   )
 
-  const ROIAnalysisTab: React.FC<{ roiData: any }> = ({ roiData }) => (
+  const ROIAnalysisTab: React.FC<{ roiData: TestResult['roi_analysis'] }> = ({ roiData }) => (
     <div className="space-y-8">
       {roiData ? (
         <>
@@ -376,7 +407,7 @@ function App() {
     </div>
   )
 
-  const DetailedReportTab: React.FC<{ reportData: any }> = ({ reportData }) => (
+  const DetailedReportTab: React.FC<{ reportData: TestResult['detailed_report'] }> = ({ reportData }) => (
     <div className="space-y-8">
       {reportData ? (
         <>
@@ -397,7 +428,7 @@ function App() {
                   <div>
                     <h4 className="text-purple-400 font-semibold mb-3">Recommended Solutions</h4>
                     <div className="space-y-3">
-                      {reportData.recommended_solutions?.map((solution: any, idx: number) => (
+                      {reportData.recommended_solutions?.map((solution: { title: string; priority: string; timeline: string; investment: string }, idx: number) => (
                         <div key={idx} className="bg-purple-500/20 border border-purple-500 rounded-lg p-3">
                           <h5 className="text-white font-medium">{solution.title}</h5>
                           <p className="text-sm text-gray-300 mt-1">Priority: {solution.priority}</p>
@@ -741,14 +772,11 @@ function App() {
     <div className="min-h-screen bg-black">
       <div className="relative z-10">
         <header className="border-b border-gray-800/50 bg-black/30 backdrop-blur-sm">
-          <div className="max-w-7xl mx-auto px-4 py-2">
+          <div className="max-w-7xl mx-auto px-4 py-4">
             <div className="flex items-center justify-between">
-              <div className="flex items-center space-x-4">
-                <div className="flex flex-col items-center space-y-1">
-                  <img src="/logo.png" alt="AiAlive" className="w-12 h-12" />
-                  <img src="/favicon.png" alt="AI IQ" className="w-6 h-6" />
-                </div>
-                <h1 className="text-xl font-bold text-white">AI IQ Test Results</h1>
+              <div className="flex items-center space-x-6">
+                <img src="/logo.png" alt="AiAlive" className="h-16" style={{ width: '280px' }} />
+                <h1 className="text-2xl font-bold text-white">AI IQ Test Results</h1>
               </div>
               <div className="text-right">
                 <p className="text-white font-semibold text-sm">{testResult.user_name}</p>
