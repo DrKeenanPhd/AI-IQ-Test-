@@ -16,6 +16,11 @@
 VITE_API_URL=https://app-oxl-ftweu.fly.dev
 ```
 
+**Backend Health Check:**
+- Primary: https://app-oxl-ftweu.fly.dev/healthz
+- Alternative: https://app-oxlftweu.fly.dev/healthz
+- Use the URL that returns HTTP 200 for VITE_API_URL
+
 ### Dev Branch Deployment (Option B - Separate Project)
 - **Target URL:** https://ai-iq-frontend-dev.vercel.app/
 - **Branch:** dev (as production branch of separate project)
@@ -51,18 +56,26 @@ Located at `ai-iq-frontend/vite.config.ts` - Vite build configuration:
 - Rollback capability via git tags
 
 ## Troubleshooting Production Deployment
-If production deployment shows old UI despite having commits:
-1. Check Vercel project settings:
-   - Production Branch should be "production"
-   - Root Directory should be "ai-iq-frontend"
-   - Framework Preset should be "Vite"
-2. Verify build settings:
-   - Build Command: `npm run build`
-   - Output Directory: `dist`
-   - Install Command: `npm ci`
-3. Check environment variables are set
-4. Manually redeploy latest commit in Vercel dashboard
-5. Clear Vercel build cache if needed
+If production deployment is broken or shows old UI:
+1. **Emergency Restoration Steps:**
+   - Check Vercel project settings:
+     - Production Branch should be "production" (not main)
+     - Root Directory should be "ai-iq-frontend"
+     - Framework Preset should be "Vite"
+   - Verify build settings:
+     - Build Command: `npm run build`
+     - Output Directory: `dist`
+     - Install Command: `npm ci`
+   - **Critical**: Check environment variables are set:
+     - VITE_API_URL must be configured for all environments
+   - Manually redeploy latest commit in Vercel dashboard
+   - **Always uncheck "Use existing Build Cache"** for fresh deployment
+
+2. **Backend Connectivity Issues:**
+   - Test backend health: curl https://app-oxl-ftweu.fly.dev/healthz
+   - If 404/timeout, try alternative: https://app-oxlftweu.fly.dev/healthz
+   - Update VITE_API_URL in Vercel to working backend URL
+   - Redeploy after environment variable changes
 
 ## Dev Branch Deployment Setup
 To create separate dev project:

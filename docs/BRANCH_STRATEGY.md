@@ -165,14 +165,16 @@ git push origin production
 ### Production
 - **URL:** https://ai-iq-frontend.vercel.app/
 - **Branch:** production
-- **Status:** Active deployment
+- **Status:** Under restoration (was broken, being fixed)
 - **Version:** v0.1.0 (tagged)
+- **Commit:** 9b63a38 (UI improvements: 280px logo, removed widget, repositioned CTA)
 
 ### Development
-- **Target URL:** https://ai-iq-frontend-git-dev-drkeenanphd.vercel.app/
+- **Target URL:** https://ai-iq-frontend-git-dev-ai-alive.vercel.app/
 - **Branch:** dev
-- **Status:** Needs configuration (currently 404)
+- **Status:** To be configured via Vercel branch deployment
 - **Version:** Latest dev commits
+- **Commit:** 4ee6e1f (synced with production UI improvements)
 
 ### Features
 - **280px Logo:** ✅ Implemented in both branches
