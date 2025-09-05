@@ -10,6 +10,7 @@ from .ghl_client import GHLClient
 from .test_engine import AIIQTestEngine
 from .vapi_client import VAPIClient
 from .stripe_client import StripeClient
+from .smart_links import SmartLink
 from typing import Dict, List, Optional, Any
 from datetime import datetime, timedelta
 import uuid
@@ -38,6 +39,7 @@ subscriptions_db = {}
 ghl_client = GHLClient()
 test_engine = AIIQTestEngine()
 vapi_client = VAPIClient()
+smart_links = SmartLink()
 stripe_client = StripeClient()
 
 def create_sample_result(user_id: str) -> DynamicTestResult:
@@ -272,6 +274,43 @@ async def get_test_result(result_id: str):
         created_at=result.created_at
     )
 
+@app.get("/public/report", response_model=TestResultResponse)
+async def public_report(contact_id: str, expires: str, sig: str):
+    """Get test results via smart link with HMAC validation"""
+    if not smart_links.validate(contact_id, expires, sig):
+        raise HTTPException(status_code=401, detail="Invalid or expired link")
+
+    user_id = smart_links.find_user_by_contact_id(contact_id, users_db)
+    if not user_id:
+        raise HTTPException(status_code=404, detail="User not found")
+
+    latest_id = None
+    latest_created_at = None
+    for rid, res in test_results_db.items():
+        if res.user_id == user_id:
+            if latest_created_at is None or res.created_at > latest_created_at:
+                latest_created_at = res.created_at
+                latest_id = rid
+
+    if not latest_id:
+        raise HTTPException(status_code=404, detail="No results found")
+
+    result = test_results_db[latest_id]
+    user = users_db[user_id]
+    return TestResultResponse(
+        id=latest_id,
+        user_email=user["email"],
+        user_name=user["name"],
+        contact_id=user.get("ghl_contact_id"),
+        pain_points={k: v.dict() for k, v in result.pain_points.items()},
+        categories={k: v.dict() for k, v in result.categories.items()},
+        overall_score=result.overall_score,
+        recommendations=result.recommendations,
+        custom_sections={k: v.dict() for k, v in result.custom_sections.items()} if result.custom_sections else None,
+        report_metadata=result.report_metadata,
+        created_at=result.created_at
+    )
+
 @app.get("/users/{user_id}/test-results")
 async def get_user_test_results(user_id: str):
     if user_id not in users_db:
@@ -296,13 +335,15 @@ async def handle_vapi_webhook(webhook_data: Dict[str, Any]):
         
         await vapi_client.trigger_site_webhook(
             result["contact_id"], 
-            result["test_result"]
+            result["test_result"],
+            result.get("smart_link", "")
         )
         
         return {
             "status": "success",
             "message": "VAPI test results processed successfully",
             "contact_id": result["contact_id"],
+            "smart_link": result.get("smart_link", ""),
             "overall_score": result["test_result"].overall_score
         }
         

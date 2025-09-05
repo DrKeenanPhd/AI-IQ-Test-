@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
@@ -156,6 +156,30 @@ function App() {
   })
 
   const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:8000'
+
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search)
+    const contact_id = params.get('contact_id')
+    const expires = params.get('expires')
+    const sig = params.get('sig')
+    if (!contact_id || !expires || !sig) return
+
+    const run = async () => {
+      setLoading(true); setError(null)
+      try {
+        const res = await fetch(`${API_URL}/public/report?contact_id=${encodeURIComponent(contact_id)}&expires=${encodeURIComponent(expires)}&sig=${encodeURIComponent(sig)}`)
+        if (!res.ok) throw new Error('Invalid or expired link')
+        const data = await res.json()
+        setIsAuthenticated(true)
+        setTestResult(data)
+      } catch (e) {
+        setError(e instanceof Error ? e.message : 'Link error')
+      } finally {
+        setLoading(false)
+      }
+    }
+    run()
+  }, [API_URL])
 
   const handleAuth = async (e: React.FormEvent) => {
     e.preventDefault()

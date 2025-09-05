@@ -1,11 +1,13 @@
 import httpx
 import os
+import time
 from typing import Dict, Any, Optional
 import json
 import logging
 from datetime import datetime
 from .models import DynamicTestResult, PainPoint, Category, SeverityLevel, TestParameter
 from .ghl_client import GHLClient
+from .smart_links import SmartLink
 
 logger = logging.getLogger(__name__)
 
@@ -15,6 +17,8 @@ class VAPIClient:
         self.assistant_id = os.getenv("VAPI_ASSISTANT_ID")
         self.base_url = os.getenv("VAPI_BASE_URL", "https://api.vapi.ai")
         self.ghl_client = GHLClient()
+        self.smart_links = SmartLink()
+        self.frontend_base_url = os.getenv("FRONTEND_BASE_URL", "https://ai-iq-frontend.vercel.app")
         
         if not self.api_key or not self.assistant_id:
             logger.warning("VAPI API credentials not configured. VAPI integration will be disabled.")
@@ -40,7 +44,10 @@ class VAPIClient:
             if not email or not name:
                 raise ValueError("Missing required contact information")
             
-            ghl_custom_fields = self.format_vapi_results_for_ghl(webhook_data)
+            contact_id = contact_result.get("contact", {}).get("id")
+            smart_link = self.smart_links.generate_link(contact_id, self.frontend_base_url)
+            
+            ghl_custom_fields = self.format_vapi_results_for_ghl(webhook_data, smart_link)
             contact_result = await self.ghl_client.create_or_update_contact(
                 email=email,
                 name=name,
@@ -147,7 +154,7 @@ class VAPIClient:
             created_at=datetime.now()
         )
     
-    def format_vapi_results_for_ghl(self, vapi_data: Dict[str, Any]) -> Dict[str, Any]:
+    def format_vapi_results_for_ghl(self, vapi_data: Dict[str, Any], smart_link: str) -> Dict[str, Any]:
         """Format create_json_output tool results for GHL custom fields"""
         ghl_fields = {}
         
@@ -178,10 +185,11 @@ class VAPIClient:
         ghl_fields["ai_iq_priority_actions"] = json.dumps(overall_data.get("priority_recommendations", []))
         ghl_fields["ai_iq_quick_wins"] = json.dumps(overall_data.get("quick_wins", []))
         ghl_fields["ai_iq_next_steps"] = json.dumps(overall_data.get("next_steps", []))
+        ghl_fields["ai_iq_smart_link"] = smart_link
         
         return ghl_fields
     
-    async def trigger_site_webhook(self, contact_id: str, test_result_data: Dict[str, Any]) -> bool:
+    async def trigger_site_webhook(self, contact_id: str, test_result_data: Dict[str, Any], smart_link: str) -> bool:
         """Trigger webhook to notify site of new test results"""
         webhook_url = os.getenv("SITE_WEBHOOK_URL")
         if not webhook_url:
@@ -196,6 +204,7 @@ class VAPIClient:
                         "event_type": "vapi_test_completed",
                         "contact_id": contact_id,
                         "test_data": test_result_data,
+                        "smart_link": smart_link,
                         "timestamp": datetime.now().isoformat()
                     },
                     headers={"Content-Type": "application/json"}
