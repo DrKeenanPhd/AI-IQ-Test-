@@ -1,2 +1,9 @@
 *.pyc
 __pycache__/
+
+# Environment files (never commit secrets)
+.env
+*.env
+.env.*
+ai-iq-backend/.env
+ai-iq-frontend/.env
