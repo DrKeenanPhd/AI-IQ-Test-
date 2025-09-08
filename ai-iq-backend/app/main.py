@@ -10,6 +10,7 @@ from .ghl_client import GHLClient
 from .test_engine import AIIQTestEngine
 from .vapi_client import VAPIClient
 from .stripe_client import StripeClient
+from .token_router import router as token_router
 from typing import Dict, List, Optional, Any
 from datetime import datetime, timedelta
 import uuid
@@ -39,6 +40,10 @@ ghl_client = GHLClient()
 test_engine = AIIQTestEngine()
 vapi_client = VAPIClient()
 stripe_client = StripeClient()
+
+# Mount token endpoints
+app.include_router(token_router, prefix="/auth", tags=["auth-tokens"]) 
+
 
 def create_sample_result(user_id: str) -> DynamicTestResult:
     return test_engine.generate_dynamic_test_result(user_id)

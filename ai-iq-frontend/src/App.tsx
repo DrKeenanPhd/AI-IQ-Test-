@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import React, { useState } from 'react'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
@@ -6,7 +6,8 @@ import { Progress } from '@/components/ui/progress'
 import { Badge } from '@/components/ui/badge'
 import { Alert, AlertDescription } from '@/components/ui/alert'
 import { TrendingUp, CheckCircle, AlertTriangle, Clock, Mic, Target } from 'lucide-react'
-import './App.css'
+import { SidebarSessions } from '@/components/SidebarSessions'
+
 
 interface UserAuth {
   email: string
@@ -122,10 +123,14 @@ interface TestResult {
 
 function App() {
   const [isAuthenticated, setIsAuthenticated] = useState(false)
-  const [, setUserId] = useState<string | null>(null)
+  const [userId, setUserId] = useState<string | null>(null)
   const [testResult, setTestResult] = useState<TestResult | null>(null)
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
+
+  type Session = { id: string; title: string; date: string; score?: number; tier?: 'free' | 'basic' | 'premium' }
+  const [sessions, setSessions] = useState<Session[]>([])
+
   const [activeTab, setActiveTab] = useState<'test-results' | 'roi-analysis' | 'detailed-report'>('test-results')
 
   const TabButton: React.FC<{ 
@@ -179,6 +184,7 @@ function App() {
       setUserId(data.user_id)
       setIsAuthenticated(true)
       
+      // Fetch the latest test result (create one now)
       const resultResponse = await fetch(`${API_URL}/test-results`, {
         method: 'POST',
         headers: {
@@ -190,6 +196,20 @@ function App() {
       if (resultResponse.ok) {
         const resultData = await resultResponse.json()
         setTestResult(resultData)
+        
+        // Fetch list of sessions for the user
+        const sessionsResp = await fetch(`${API_URL}/users/${data.user_id}/test-results`)
+        if (sessionsResp.ok) {
+          const sessionsData = await sessionsResp.json()
+          const mapped: Session[] = (sessionsData.results || []).map((r: any) => ({
+            id: r.id,
+            title: `AI IQ Test – ${new Date(r.created_at).toLocaleDateString()}`,
+            date: new Date(r.created_at).toLocaleDateString(undefined, { month: 'short', day: '2-digit' }),
+            score: r.overall_score,
+            tier: 'premium'
+          }))
+          setSessions(mapped)
+        }
       }
     } catch (err) {
       setError(err instanceof Error ? err.message : 'An error occurred')
@@ -230,7 +250,7 @@ function App() {
         </CardHeader>
         <CardContent>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {Object.entries(testResult.categories).map(([key, category]: [string, Category]) => (
+            {(Object.entries(testResult.categories) as [string, Category][]).map(([key, category]) => (
               <Card key={key} className="bg-black/50 border-gray-700">
                 <CardHeader>
                   <CardTitle className="text-white text-lg">{formatCategoryName(key)}</CardTitle>
@@ -309,7 +329,7 @@ function App() {
           </CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
-          {Object.entries(testResult.pain_points).map(([key, point]: [string, PainPoint]) => (
+          {(Object.entries(testResult.pain_points) as [string, PainPoint][]).map(([key, point]) => (
             <div key={key} className="flex items-start space-x-3 p-4 bg-black/50 rounded-lg">
               {getSeverityIcon(point.severity)}
               <div className="flex-1">
@@ -769,7 +789,18 @@ function App() {
   }
 
   return (
-    <div className="min-h-screen bg-black">
+    <div className="min-h-screen bg-black grid grid-cols-[280px_1fr]">
+      <SidebarSessions sessions={sessions} onSelect={async (id) => {
+        try {
+          const resp = await fetch(`${API_URL}/test-results/${id}`)
+          if (resp.ok) {
+            const data = await resp.json()
+            setTestResult(data)
+          }
+        } catch (e) {
+          console.error('Failed to fetch session', e)
+        }
+      }} />
       <div className="relative z-10">
         <header className="border-b border-gray-800/50 bg-black/30 backdrop-blur-sm">
           <div className="max-w-7xl mx-auto px-4 py-4">

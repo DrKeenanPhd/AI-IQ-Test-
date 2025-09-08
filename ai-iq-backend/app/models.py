@@ -62,14 +62,17 @@ class Category(BaseModel):
 
 class DynamicTestResult(BaseModel):
     user_id: str
+    schema_version: Optional[str] = None
+    score_max: int = 200
+    overall_score: int
+    overall_score_norm: Optional[float] = None  # 0-100 normalized for visuals
     pain_points: Dict[str, PainPoint]
     categories: Dict[str, Category]
-    overall_score: int
     recommendations: List[str]
     custom_sections: Optional[Dict[str, DynamicSection]] = None
     test_parameters: Optional[Dict[str, TestParameter]] = None
     report_metadata: Optional[Dict[str, Any]] = None
-    created_at: datetime
+    created_at: datetime = datetime.now()
 
 class ROIAnalysis(BaseModel):
     estimated_monthly_savings: float
@@ -95,6 +98,7 @@ class TestResultResponse(BaseModel):
     user_email: str
     user_name: str
     contact_id: Optional[str] = None
+    session_id: Optional[str] = None
     pain_points: Dict[str, Dict[str, Any]]
     categories: Dict[str, Dict[str, Any]]
     overall_score: int
@@ -161,5 +165,35 @@ class SubscriptionResponse(BaseModel):
 
 class StripeWebhookEvent(BaseModel):
     id: str
+class TestRunType(str, Enum):
+    FULL = "full"
+    MINI = "mini"
+
+class TestRunStatus(str, Enum):
+    QUEUED = "queued"
+    RUNNING = "running"
+    COMPLETE = "complete"
+    FAILED = "failed"
+
+class TestRun(BaseModel):
+    id: str
+    user_id: str
+    type: TestRunType
+    topic: Optional[str] = None  # for mini-tests, e.g., website/social/search
+    status: TestRunStatus = TestRunStatus.QUEUED
+    started_at: Optional[datetime] = None
+    completed_at: Optional[datetime] = None
+    score: Optional[float] = None
+    payload: Optional[Dict[str, Any]] = None
+    source: Optional[str] = None  # agent|ui
+    created_by: Optional[str] = None
+
+class IQScore(BaseModel):
+    id: str
+    user_id: str
+    score: float
+    period_month: str  # e.g., "2025-09"
+    computed_at: datetime = datetime.now()
+    delta_vs_prev: Optional[float] = None
     type: str
     data: Dict[str, Any]

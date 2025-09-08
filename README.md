@@ -1,5 +1,12 @@
 # AI IQ Test Results Platform
 
+
+## Project Continuity
+
+- For a comprehensive audit summary and next steps, see `PROJECT_AUDIT_PROGRESS.md` at the repo root.
+- For all ongoing design decisions, technical strategies, and rationale, see `STRATEGY_AND_DESIGN.md` at the repo root.
+- Any new session or developer should start by reviewing these two files for full project context and instructions.
+
 A dynamic web report page that displays comprehensive AI audit results for businesses, featuring beautiful data visualization and AI widget integration.
 
 ## Features
