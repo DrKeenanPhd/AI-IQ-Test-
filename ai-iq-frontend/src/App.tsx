@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
@@ -127,8 +127,25 @@ function App() {
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const [activeTab, setActiveTab] = useState<'test-results' | 'roi-analysis' | 'detailed-report'>('test-results')
+  const [widgetMode, setWidgetMode] = useState<'chat' | 'voice'>(() => {
+    const saved = localStorage.getItem('vapi_widget_mode')
+    return (saved === 'chat' || saved === 'voice') ? saved : 'voice'
+  })
+  const [ctaColors, setCtaColors] = useState({ bg: '#000000', fg: '#ffffff' })
 
-  const TabButton: React.FC<{ 
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      const widget = document.querySelector('vapi-widget')
+      if (widget) {
+        const bg = widget.getAttribute('cta-button-color') || '#000000'
+        const fg = widget.getAttribute('cta-button-text-color') || '#ffffff'
+        setCtaColors({ bg, fg })
+      }
+    }, 100)
+    return () => clearTimeout(timer)
+  }, [widgetMode])
+
+  const TabButton: React.FC<{
     tabId: 'test-results' | 'roi-analysis' | 'detailed-report', 
     number: string, 
     title: string, 
@@ -838,6 +855,59 @@ function App() {
           </div>
         </main>
       </div>
+
+      {/* VAPI voice/chat widget */}
+      <div key={widgetMode}>
+        <vapi-widget
+          public-key="07328ee1-d2b7-4cab-9781-1dfc01d63f20"
+          assistant-id="6c0cb687-9f59-4f60-a9da-a9fb438b3723"
+          mode={widgetMode}
+          theme="dark"
+          base-bg-color="#000000"
+          accent-color="#14B8A6"
+          cta-button-color="#000000"
+          cta-button-text-color="#ffffff"
+          border-radius="large"
+          size="compact"
+          position="bottom-right"
+          title="TALK WITH AI"
+          start-button-text="Start"
+          end-button-text="End Call"
+          chat-first-message="Hey, How can I help you today?"
+          chat-placeholder="Type your message..."
+          voice-show-transcript="true"
+          consent-required="true"
+          consent-title="Terms and conditions"
+          consent-content='By clicking "Agree," and each time I interact with this AI agent, I consent to the recording, storage, and sharing of my communications with third-party service providers, and as otherwise described in our Terms of Service.'
+          consent-storage-key="vapi_widget_consent"
+        ></vapi-widget>
+      </div>
+
+      {/* Visible toggle button, styled like widget CTA */}
+      <button
+        type="button"
+        onClick={() => {
+          const next = widgetMode === 'voice' ? 'chat' : 'voice'
+          setWidgetMode(next)
+          localStorage.setItem('vapi_widget_mode', next)
+        }}
+        style={{
+          position: 'fixed',
+          right: '1.5rem',
+          bottom: '7rem',
+          backgroundColor: ctaColors.bg,
+          color: ctaColors.fg,
+          padding: '0.5rem 0.875rem',
+          borderRadius: '0.5rem',
+          border: '1px solid rgba(255,255,255,0.12)',
+          zIndex: 70,
+          fontWeight: 600,
+          fontSize: '0.875rem',
+        }}
+        aria-label="Toggle widget mode"
+      >
+        {widgetMode === 'voice' ? 'text' : 'voice'}
+      </button>
     </div>
   )
 }
